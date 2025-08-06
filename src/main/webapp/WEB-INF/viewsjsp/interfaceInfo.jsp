@@ -165,8 +165,8 @@
 								Interface Details of <span id="nodeipdetailsstore"><%=request.getParameter("nodeIP")%></span>
 								~ <span id="interfacenamedetailsstroe"><%=request.getParameter("intName")%></span>
 							</h4>
-							<button type="button" class="btn btn-primary"
-								onclick="speedtestinterfaceonclick()">Speed Test</button>
+<!-- 							<button type="button" class="btn btn-primary" -->
+<!-- 								onclick="speedtestinterfaceonclick()">Speed Test</button> -->
 						</div>
 						<!-- /.col -->
 						<div class="col-sm-6">
