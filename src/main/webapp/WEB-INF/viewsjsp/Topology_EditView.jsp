@@ -92,9 +92,8 @@
 
 							<div class="card">
 								<div class="card-header">
-									<h3 class="card-title">Node Status & Notes Report</h3>
-									&nbsp; &nbsp; &nbsp;<b>From Date :</b> ${fdate} <b>&nbsp;
-										&nbsp; &nbsp;To Date :</b> ${tdate}
+									<h3 class="card-title">Topology View Status Details</h3>
+									
 
 								</div>
 								<!-- /.card-header -->
@@ -118,31 +117,11 @@
 												<th>STATE</th>
 												<th>ZONE</th>
 												<th>GROUP_NAME</th>
-												<th>ADD NOTES</th>
-												<th>VIEW NOTES</th>
+<!-- 												<th>ADD NOTES</th> -->
+												<th>TIME & NOTES</th>
 											</tr>
 										</thead>
-										<tbody>
-
-											<c:forEach var="report" items="${statusReportData}">
-												<tr>
-													<td>${report.ID}</td>
-													<td>${report.NODE_IP}</td>
-													<td>${report.NODE_STATUS}</td>
-													<td>${report.EVENT_TIMESTAMP}</td>
-													<td>${report.DEVICE_NAME}</td>
-													<td>${report.LOCATION}</td>
-													<td>${report.DISTRICT}</td>
-													<td>${report.STATE}</td>
-													<td>${report.ZONE}</td>
-													<td>${report.GROUP_NAME}</td>
-													<td>${report.ADD_NOTES}</td>
-													<td>${report.VIEW_NOTES}</td>
-
-												</tr>
-											</c:forEach>
-
-										</tbody>
+										
 										<tfoot>
 											<tr>
 												<th>ID</th>
@@ -155,7 +134,7 @@
 												<th>STATE</th>
 												<th>ZONE</th>
 												<th>GROUP_NAME</th>
-												<th>ADD NOTES</th>
+<!-- 												<th>ADD NOTES</th> -->
 												<th>VIEW NOTES</th>
 											</tr>
 										</tfoot>
@@ -177,42 +156,7 @@
 			<!-- /.content -->
 		</div>
 
-		<div class="modal fade" id="device-info-modal">
-			<!-- 	style="height: 500px;" -->
-			<div class="modal-dialog modal-lg">
-				<div class="modal-content" style="width: fit-content;">
-					<div class="modal-header">
-						<h4 class="modal-title">Notes Info</h4>
-						<button type="button" class="close" data-dismiss="modal"
-							aria-label="Close">
-							<span aria-hidden="true">&times;</span>
-						</button>
-					</div>
-					<div class="modal-body" id="deviceInfoBody">
-						<div class="card-body table-responsive p-0">
-							<table class="table table-striped table-valign-middle"
-								id="deviceInfoTable">
-								<thead>
-									<tr>
-										<th>Sr No.</th>
-										<th>ID</th>
-										<th>Notes</th>
-										<th>Date & Time</th>
-
-									</tr>
-								</thead>
-								<tbody>
-
-								</tbody>
-							</table>
-						</div>
-					</div>
-
-				</div>
-				<!-- /.modal-content -->
-			</div>
-			<!-- /.modal-dialog -->
-		</div>
+		
 		<!-- /.modal -->
 		<!-- /.content-wrapper -->
 		<!-- Footer  -->
@@ -422,60 +366,7 @@
 -->
 
 
-	<script>
-$(function() {
-    $('#example1').DataTable({
-        lengthChange: false,
-        autoWidth: false,
-        pageLength: 10,
-        scrollX: true,
-        scrollY: true,
-        buttons: [
-            "copy",
-            "csv",
-            {
-                extend: "excelHtml5",
-                exportOptions: {
-                    columns: ':visible' // export only visible columns
-                }
-            },
-            {
-                extend: "pdfHtml5",
-                orientation: "landscape",  // fit more columns
-                pageSize: "A4",            // larger page size
-                exportOptions: {
-                    columns: ':visible'     // or ':all' to include hidden columns
-                },
-                customize: function (doc) {
-                    doc.defaultStyle.fontSize = 8; // smaller font
-                    doc.styles.tableHeader.fontSize = 9;
-                    doc.styles.tableHeader.alignment = 'left';
-
-                    // Fix column width issues
-                    var objLayout = {};
-                    objLayout['hLineWidth'] = function(i) { return .5; };
-                    objLayout['vLineWidth'] = function(i) { return .5; };
-                    objLayout['hLineColor'] = function(i) { return '#aaa'; };
-                    objLayout['vLineColor'] = function(i) { return '#aaa'; };
-                    objLayout['paddingLeft'] = function(i) { return 4; };
-                    objLayout['paddingRight'] = function(i) { return 4; };
-                    doc.content[1].layout = objLayout;
-                }
-            },
-            "print",
-            "colvis"
-        ],
-        initComplete: function(settings, json) {
-            // Hide loader once the DataTable is initialized
-            $('#spinnerTopConnChart').hide();
-        },
-        drawCallback: function(settings) {
-            // Hide loader after each draw (page change, etc.)
-            $('#spinnerTopConnChart').hide();
-        }
-    }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
-});
-</script>
+	
 
 </body>
 </html>

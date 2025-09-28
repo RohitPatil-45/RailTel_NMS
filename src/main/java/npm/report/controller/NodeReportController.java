@@ -51,6 +51,17 @@ public class NodeReportController {
 	@Autowired
 	NodeReportService service;
 
+	@RequestMapping("/ManualTologyList")
+	public String ManualTologogyList(HttpServletRequest req, HttpServletResponse res) {
+		System.out.println("Controller Called deviceStatus report");
+
+		// m.addAttribute("fetching", new UserMasterBean());
+//		ModelAndView m = new ModelAndView();
+//		m.addObject("groupName", dao.getGroupMap());
+//		m.setViewName("DeviceStatusReport");
+		return "ManualTopogyList";
+	}
+
 	@RequestMapping("/deviceStatus")
 	public ModelAndView DeviceReportForm(HttpServletRequest req, HttpServletResponse res) {
 		System.out.println("Controller Called deviceStatus report");
@@ -59,6 +70,17 @@ public class NodeReportController {
 		ModelAndView m = new ModelAndView();
 		m.addObject("groupName", dao.getGroupMap());
 		m.setViewName("DeviceStatusReport");
+		return m;
+	}
+
+	@RequestMapping("/DeviceStatusNotesReport")
+	public ModelAndView DeviceStatusNotesReport(HttpServletRequest req, HttpServletResponse res) {
+		System.out.println("Controller Called deviceStatus report");
+
+		// m.addAttribute("fetching", new UserMasterBean());
+		ModelAndView m = new ModelAndView();
+		m.addObject("groupName", dao.getGroupMap());
+		m.setViewName("DeviceStatusNotesReport");
 		return m;
 	}
 
@@ -249,6 +271,41 @@ public class NodeReportController {
 		return m;
 
 	}
+
+	@RequestMapping("/DeviceStatusViewNotesReport")
+	public ModelAndView DeviceStatusViewNotesReport(HttpServletRequest req, HttpServletResponse res) {
+		System.out.println("Controller nodeStatusReport");
+		String from_date = req.getParameter("from_date");
+		String to_date = req.getParameter("to_date");
+		String[] ip_address = req.getParameterValues("ipAddressCheck");
+//		String ip = "192.168.0.230";
+		List<String> list = Arrays.asList(ip_address);
+
+		System.out.println("ip_list :" + list);
+		System.out.println("to_date :" + to_date);
+		System.out.println("from date:" + from_date);
+
+		List<NodeStatusReportBean> historyData = service.DeviceStatusViewNotesReport(from_date, to_date, list);
+		System.out.println("Report Data:" + historyData);
+		ModelAndView m = new ModelAndView();
+		m.addObject("statusReportData", historyData);
+		m.addObject("fdate", from_date);
+		m.addObject("tdate", to_date);
+		m.setViewName("DeviceStatusViewNotesReport");
+		return m;
+
+	}
+
+//	@RequestMapping("/DeviceStatusViewNotesReport")
+//	public ModelAndView DeviceStatusViewNotesReport(HttpServletRequest req, HttpServletResponse res) {
+//		System.out.println("Controller Called deviceStatus report");
+//
+//		// m.addAttribute("fetching", new UserMasterBean());
+//		ModelAndView m = new ModelAndView();
+//		m.addObject("groupName", dao.getGroupMap());
+//		m.setViewName("DeviceStatusViewNotesReport");
+//		return m;
+//	}
 
 	@RequestMapping("/userLogReportData")
 	public ModelAndView userLogReportData(HttpServletRequest req, HttpServletResponse res) {
@@ -704,10 +761,22 @@ public class NodeReportController {
 	}
 
 	// SLA Report
+//	@RequestMapping("/slaReportForm")
+//	public String slaReportForm() {
+//
+//		return "SLAReportForm";
+//	}
+	
+	
 	@RequestMapping("/slaReportForm")
-	public String slaReportForm() {
+	public ModelAndView slaReportForm(HttpServletRequest req, HttpServletResponse res) {
+		System.out.println("Controller Called avarageLatencyReport");
 
-		return "SLAReportForm";
+		// m.addAttribute("fetching", new UserMasterBean());
+		ModelAndView m = new ModelAndView();
+//		m.addObject("loation", dao.getLocationMap());
+		m.setViewName("SLAReportForm");
+		return m;
 	}
 
 	@RequestMapping("/slaReport")
@@ -716,7 +785,8 @@ public class NodeReportController {
 		String from_date = req.getParameter("from_date");
 		String to_date = req.getParameter("to_date");
 		String yearlyCost = req.getParameter("yearlyCost");
-		m.addObject("slaReportData", service.getSlaReport(from_date, to_date, yearlyCost));
+		String location = req.getParameter("location");
+		m.addObject("slaReportData", service.getSlaReport(from_date, to_date, yearlyCost,location));
 		m.addObject("fdate", from_date);
 		m.addObject("tdate", to_date);
 		m.setViewName("SLAReportView");
@@ -1556,6 +1626,48 @@ public class NodeReportController {
 			out = response.getWriter();
 			String id = request.getParameter("id");
 			JSONArray jsonresponse = service.getDevicenNotesInfo(id);
+			out.print(jsonresponse);
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		} finally {
+			out.close();
+		}
+		return null;
+	}
+
+	@RequestMapping(value = "/getview_topology", method = RequestMethod.POST)
+	public JSONArray getview_topology(ModelMap model, HttpServletRequest request, HttpServletResponse response,
+			HttpSession session) {
+		System.out.println("inside getDevicenNotesInfo");
+		PrintWriter out = null;
+		try {
+			out = response.getWriter();
+//			String id = request.getParameter("id");
+			String userScopeData = (String) session.getAttribute("userScope");
+			JSONArray jsonresponse = service.getview_topology(userScopeData);
+			out.print(jsonresponse);
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		} finally {
+			out.close();
+		}
+		return null;
+	}
+
+	@RequestMapping(value = "/Deleteview_topology", method = RequestMethod.POST)
+	public JSONArray Deleteview_topology(ModelMap model, HttpServletRequest request, HttpServletResponse response,
+			HttpSession session) {
+
+		PrintWriter out = null;
+		try {
+			out = response.getWriter();
+			String id = request.getParameter("id");
+//			System.out.println("inside getDevicenNotesInfo" + id);
+//			String id = (String) session.getAttribute("userScope");
+			String jsonresponse = service.Deleteview_topology(id);
+//			System.out.println("jsonresponse getDevicenNotesInfo" + jsonresponse);
 			out.print(jsonresponse);
 		} catch (Exception e) {
 			// TODO: handle exception

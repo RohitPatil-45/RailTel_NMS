@@ -15,22 +15,22 @@ scratch. This page gets rid of all links and provides the needed markup only.
 	href="<%=request.getContextPath()%>/webtemplate/dist/img/AdminLTELogo.png">
 </head>
 <body class="hold-transition layout-top-nav">
-	<% String sessionUser = (String)session.getAttribute("username"); 
-    String adminScope = (String)session.getAttribute("adminScope"); 
-    String dashboardScope = (String)session.getAttribute("dashboardScope"); 
-    String reportScope = (String)session.getAttribute("reportScope");
-    String graphScope = (String)session.getAttribute("graphScope");
-    
-    
-    //session.setMaxInactiveInterval(10); %>
+	<%
+	String sessionUser = (String) session.getAttribute("username");
+	String adminScope = (String) session.getAttribute("adminScope");
+	String dashboardScope = (String) session.getAttribute("dashboardScope");
+	String reportScope = (String) session.getAttribute("reportScope");
+	String graphScope = (String) session.getAttribute("graphScope");
+
+	//session.setMaxInactiveInterval(10);
+	%>
 	<div class="wrapper">
 		<!-- Navbar -->
 		<nav
 			class="main-header navbar navbar-expand-md navbar-light navbar-white">
 			<div class="container">
 				<a href="<%=request.getContextPath()%>/dashboard/summaryPage"
-					class="navbar-brand"> 
-					<img width="120"
+					class="navbar-brand"> <img width="120"
 					src="<%=request.getContextPath()%>/webtemplate/dist/img/canaris.jpeg"
 					class="">
 				</a>
@@ -55,7 +55,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 							<ul aria-labelledby="dashboardDropdownSubMenu"
 								class="dropdown-menu border-0 shadow">
 								<%
-									if (dashboardScope.contains("Home_Dashboard")) {
+								if (dashboardScope.contains("Home_Dashboard")) {
 								%>
 								<li><a
 									href="<%=request.getContextPath()%>/dashboard/summaryPage"
@@ -66,17 +66,17 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
 
 								<%
-									}
-									/* if (dashboardScope.contains("Event_Dashboard")) { */
+								}
+								/* if (dashboardScope.contains("Event_Dashboard")) { */
 								%>
 								<%-- <li class="dropdown-divider"></li>
 								<li><a
 									href="<%=request.getContextPath()%>/dashboard/sysLogEventDashboard"
 									class="dropdown-item">Event Dashboard</a></li> --%>
 								<%
-									/* }
+								/* }
 
-									if (dashboardScope.contains("Server_Details")) { */
+								if (dashboardScope.contains("Server_Details")) { */
 								%>
 								<%-- <li class="dropdown-divider"></li>
 								<li><a
@@ -84,16 +84,16 @@ scratch. This page gets rid of all links and provides the needed markup only.
 									class="dropdown-item">Server Details</a></li> --%>
 
 								<%
-									/* } */
-									if (dashboardScope.contains("Top_10")) {
+								/* } */
+								if (dashboardScope.contains("Top_10")) {
 								%>
 								<li class="dropdown-divider"></li>
 								<li><a
 									href="<%=request.getContextPath()%>/dashboard/topActivityDashboard"
 									class="dropdown-item">Top 10</a></li>
 								<%
-									}
-									if (dashboardScope.contains("Auto_Topology")) {
+								}
+								if (dashboardScope.contains("Auto_Topology")) {
 								%>
 								<li class="dropdown-divider"></li>
 								<li><a
@@ -102,17 +102,21 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
 
 								<%
-									}
-									if (dashboardScope.contains("Manual_Topology")) {
+								}
+								if (dashboardScope.contains("Manual_Topology")) {
 								%>
 
 								<li class="dropdown-divider"></li>
 								<li><a tabindex="-1"
 									href="<%=request.getContextPath()%>/master/viewManualTopology"
 									class="dropdown-item">Manual Topology</a></li>
+									
+									<li><a tabindex="-1"
+									href="<%=request.getContextPath()%>/nodeReport/ManualTologyList"
+									class="dropdown-item">Manual Topology List</a></li>
 								<%
-									}
-									if (dashboardScope.contains("Top_Talker")) {
+								}
+								if (dashboardScope.contains("Top_Talker")) {
 								%>
 								<li class="dropdown-divider"></li>
 
@@ -120,9 +124,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
 									href="<%=request.getContextPath()%>/dashboard/toptalker"
 									class="dropdown-item">Top Talker</a></li>
 								<%
-									}
-									
-									if (dashboardScope.contains("Port_Summary")) {
+								}
+
+								if (dashboardScope.contains("Port_Summary")) {
 								%>
 								<li class="dropdown-divider"></li>
 
@@ -131,7 +135,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 									class="dropdown-item">Port Summary</a></li>
 
 								<%
-									}
+								}
 								%>
 							</ul></li>
 						<li class="nav-item dropdown"><a id="adminDropdownSubMenu"
@@ -141,7 +145,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 								class="dropdown-menu border-0 shadow" style="width: max-content">
 								<!-- Level two dropdown-->
 								<%
-									if (adminScope.contains("Master")) {
+								if (adminScope.contains("Master")) {
 								%>
 								<li class="dropdown-submenu dropdown-hover"><a
 									id="adminDropdownSubMenu1" href="#" role="button"
@@ -219,8 +223,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
 											class="dropdown-item">Speed Test</a></li>
 									</ul></li>
 								<%
-									}
-									if (adminScope.contains("Node")) {
+								}
+								if (adminScope.contains("Node")) {
 								%>
 
 								<li class="dropdown-submenu dropdown-hover"><a
@@ -260,7 +264,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 										<li><a tabindex="-1"
 											href="<%=request.getContextPath()%>/node/nodeSpeedTest"
 											class="dropdown-item">Speed Test</a></li>
-											
+
 										<li><a tabindex="-1"
 											href="<%=request.getContextPath()%>/node/bgpMonitoring"
 											class="dropdown-item">BGP Monitoring</a></li>
@@ -270,8 +274,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
 									</ul></li>
 								<%
-									}
-									if (adminScope.contains("Network_Discovery")) {
+								}
+								if (adminScope.contains("Network_Discovery")) {
 								%>
 								<li class="dropdown-submenu dropdown-hover"><a
 									id="adminDropdownSubMenu1" href="#" role="button"
@@ -301,8 +305,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
 									</ul></li>
 
 								<%
-									}
-									if (adminScope.contains("Interface")) {
+								}
+								if (adminScope.contains("Interface")) {
 								%>
 
 								<li class="dropdown-submenu dropdown-hover"><a
@@ -323,8 +327,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
 									</ul></li>
 
 								<%
-									}
-									if (adminScope.contains("Service_Provisioning")) {
+								}
+								if (adminScope.contains("Service_Provisioning")) {
 								%>
 								<li class="dropdown-submenu dropdown-hover"><a
 									id="adminDropdownSubMenu1" href="#" role="button"
@@ -347,8 +351,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
 											class="dropdown-item">Push Configuration</a></li>
 									</ul></li>
 								<%
-									}
-									if (adminScope.contains("Configuration_Management")) {
+								}
+								if (adminScope.contains("Configuration_Management")) {
 								%>
 								<li class="dropdown-submenu dropdown-hover"><a
 									id="adminDropdownSubMenu1" href="#" role="button"
@@ -380,8 +384,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
 											class="dropdown-item">Read</a></li>
 									</ul></li>
 								<%
-									}
-									if (adminScope.contains("Settings")) {
+								}
+								if (adminScope.contains("Settings")) {
 								%>
 								<li class="dropdown-submenu dropdown-hover"><a
 									id="adminDropdownSubMenu1" href="#" role="button"
@@ -398,7 +402,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 									</ul></li>
 
 								<%
-									}
+								}
 								%>
 
 								<!-- End Level two -->
@@ -429,7 +433,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 							<ul aria-labelledby="adminDropdownSubMenu"
 								class="dropdown-menu border-0 shadow" style="width: max-content">
 								<%
-									if (reportScope.contains("Server_Report")) {
+								if (reportScope.contains("Server_Report")) {
 								%>
 
 								<!-- 								server dropdown -->
@@ -502,8 +506,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
 
 								<%
-									}
-									if (reportScope.contains("Node_Report")) {
+								}
+								if (reportScope.contains("Node_Report")) {
 								%>
 
 								<!-- Level two dropdown-->
@@ -523,6 +527,10 @@ scratch. This page gets rid of all links and provides the needed markup only.
 										<li><a tabindex="-1"
 											href="<%=request.getContextPath()%>/nodeReport/deviceStatus"
 											class="dropdown-item">Node Status Report</a></li>
+
+										<li><a tabindex="-1"
+											href="<%=request.getContextPath()%>/nodeReport/DeviceStatusNotesReport"
+											class="dropdown-item">Node Status Notes Report</a></li>
 										<%-- <li><a tabindex="-1"
 											href="<%=request.getContextPath()%>/nodeReport/latencyHistoryReportForm"
 											class="dropdown-item">Latency History Report</a></li>
@@ -591,8 +599,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
 											class="dropdown-item">Node Connected Devices</a></li>
 									</ul></li>
 								<%
-									}
-									if (reportScope.contains("Interface_Report")) {
+								}
+								if (reportScope.contains("Interface_Report")) {
 								%>
 
 								<li class="dropdown-submenu dropdown-hover"><a
@@ -633,8 +641,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
 									</ul></li>
 
 								<%
-									}
-									if (reportScope.contains("Working_Hour_Report")) {
+								}
+								if (reportScope.contains("Working_Hour_Report")) {
 								%>
 								<li class="dropdown-submenu dropdown-hover"><a
 									id="adminDropdownSubMenu1" href="#" role="button"
@@ -643,7 +651,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 										Hour Report</a>
 									<ul aria-labelledby="adminDropdownSubMenu1"
 										class="dropdown-menu border-0 shadow">
-										
+
 										<li><a tabindex="-1"
 											href="<%=request.getContextPath()%>/nodeReport/pingReport"
 											class="dropdown-item">Ping Report</a></li>
@@ -708,8 +716,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
 
 								<%
-									}
-									if (reportScope.contains("Top_Talker_Report")) {
+								}
+								if (reportScope.contains("Top_Talker_Report")) {
 								%>
 
 								<li class="dropdown-submenu dropdown-hover"><a
@@ -734,8 +742,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
 									</ul></li>
 
 								<%
-									}
-									if (reportScope.contains("Event_Report")) {
+								}
+								if (reportScope.contains("Event_Report")) {
 								%>
 
 								<li class="dropdown-submenu dropdown-hover"><a
@@ -750,7 +758,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 											class="dropdown-item">Windows Events</a></li>
 									</ul></li>
 								<%
-									}
+								}
 								%>
 
 								<!-- End Level two -->
@@ -762,7 +770,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 							<ul aria-labelledby="adminDropdownSubMenu"
 								class="dropdown-menu border-0 shadow">
 								<%
-									if (graphScope.contains("Node_Graph")) {
+								if (graphScope.contains("Node_Graph")) {
 								%>
 								<!-- Level two dropdown-->
 								<li class="dropdown-submenu dropdown-hover"><a
@@ -789,8 +797,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
 											class="dropdown-item">Latency Graph</a></li>
 									</ul></li>
 								<%
-									}
-									if (graphScope.contains("Interface_Graph")) {
+								}
+								if (graphScope.contains("Interface_Graph")) {
 								%>
 
 								<li class="dropdown-submenu dropdown-hover"><a
@@ -814,7 +822,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 												Graph</a></li>
 									</ul></li>
 								<%
-									}
+								}
 								%>
 
 								<!-- End Level two -->
@@ -921,6 +929,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
 	<!-- REQUIRED SCRIPTS -->
 	<!-- 	<script -->
 	<%-- 		src="<%=request.getContextPath()%>/custom_js/summaryDashboard.js"></script> --%>
-	
+
 </body>
 </html>

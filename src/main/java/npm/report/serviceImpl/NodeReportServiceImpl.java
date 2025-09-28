@@ -169,9 +169,9 @@ public class NodeReportServiceImpl implements NodeReportService {
 		return dao.viewDeviceAlertLog();
 	}
 
-	public JSONArray getSlaReport(String from_date, String to_date, String yearlyCost) {
+	public JSONArray getSlaReport(String from_date, String to_date, String yearlyCost,String location) {
 		// TODO Auto-generated method stub
-		return dao.getSlaReport(from_date, to_date, yearlyCost);
+		return dao.getSlaReport(from_date, to_date, yearlyCost,location);
 	}
 
 	public JSONArray getAvgUptimeReport(String from_date, String to_date) {
@@ -426,5 +426,21 @@ public class NodeReportServiceImpl implements NodeReportService {
 	public JSONArray getDevicenNotesInfo(String id) {
 		// TODO Auto-generated method stub
 		return dao.getDevicenNotesInfo(id);
+	}
+
+	public List<NodeStatusReportBean> DeviceStatusViewNotesReport(String from_date, String to_date,
+			List<String> ip_list) {
+		// TODO Auto-generated method stub
+		return dao.DeviceStatusViewNotesReport(from_date, to_date, ip_list);
+	}
+
+	public String Deleteview_topology(String id) {
+		// TODO Auto-generated method stub
+		return dao.Deleteview_topology(id);
+	}
+
+	public JSONArray getview_topology(String userScopeData) {
+		// TODO Auto-generated method stub
+		return dao.getview_topology(userScopeData);
 	}
 }

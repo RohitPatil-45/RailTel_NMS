@@ -92,7 +92,7 @@
 
 							<div class="card">
 								<div class="card-header">
-									<h3 class="card-title">Node Status & Notes Report</h3>
+									<h3 class="card-title">Node Status Report</h3>
 									&nbsp; &nbsp; &nbsp;<b>From Date :</b> ${fdate} <b>&nbsp;
 										&nbsp; &nbsp;To Date :</b> ${tdate}
 
@@ -118,8 +118,8 @@
 												<th>STATE</th>
 												<th>ZONE</th>
 												<th>GROUP_NAME</th>
-												<th>ADD NOTES</th>
-												<th>VIEW NOTES</th>
+<!-- 												<th>ADD NOTES</th> -->
+												<th>TIME & NOTES</th>
 											</tr>
 										</thead>
 										<tbody>
@@ -136,7 +136,7 @@
 													<td>${report.STATE}</td>
 													<td>${report.ZONE}</td>
 													<td>${report.GROUP_NAME}</td>
-													<td>${report.ADD_NOTES}</td>
+<%-- 													<td>${report.ADD_NOTES}</td> --%>
 													<td>${report.VIEW_NOTES}</td>
 
 												</tr>
@@ -155,8 +155,8 @@
 												<th>STATE</th>
 												<th>ZONE</th>
 												<th>GROUP_NAME</th>
-												<th>ADD NOTES</th>
-												<th>VIEW NOTES</th>
+<!-- 												<th>ADD NOTES</th> -->
+												<th>TIME & NOTES</th>
 											</tr>
 										</tfoot>
 
@@ -393,8 +393,8 @@
 	}
 
 </script>
+
 	<!-- Page specific script 
-	
 	<script>
 		$(function() {
 			$('#example1').DataTable(
@@ -422,7 +422,7 @@
 -->
 
 
-	<script>
+<script>
 $(function() {
     $('#example1').DataTable({
         lengthChange: false,
@@ -436,46 +436,62 @@ $(function() {
             {
                 extend: "excelHtml5",
                 exportOptions: {
-                    columns: ':visible' // export only visible columns
+                    columns: ':visible'
                 }
             },
             {
                 extend: "pdfHtml5",
-                orientation: "landscape",  // fit more columns
-                pageSize: "A4",            // larger page size
+                orientation: "landscape",   // Landscape = wide
+                pageSize: "A3",             // A3 fits more columns
                 exportOptions: {
-                    columns: ':visible'     // or ':all' to include hidden columns
+                    columns: ':visible'
                 },
                 customize: function (doc) {
-                    doc.defaultStyle.fontSize = 8; // smaller font
-                    doc.styles.tableHeader.fontSize = 9;
+                    // Smaller font for more data fitting
+                    doc.defaultStyle.fontSize = 7;
+                    doc.styles.tableHeader.fontSize = 8;
                     doc.styles.tableHeader.alignment = 'left';
 
-                    // Fix column width issues
+                    // Ensure table uses full width
+                    var tableNode = doc.content[1].table;
+                    var columnCount = tableNode.body[0].length;
+                    tableNode.widths = new Array(columnCount).fill('*'); // equal column widths
+
+                    // Reduce padding
                     var objLayout = {};
-                    objLayout['hLineWidth'] = function(i) { return .5; };
-                    objLayout['vLineWidth'] = function(i) { return .5; };
+                    objLayout['hLineWidth'] = function(i) { return 0.5; };
+                    objLayout['vLineWidth'] = function(i) { return 0.5; };
                     objLayout['hLineColor'] = function(i) { return '#aaa'; };
                     objLayout['vLineColor'] = function(i) { return '#aaa'; };
-                    objLayout['paddingLeft'] = function(i) { return 4; };
-                    objLayout['paddingRight'] = function(i) { return 4; };
+                    objLayout['paddingLeft'] = function(i) { return 2; };
+                    objLayout['paddingRight'] = function(i) { return 2; };
                     doc.content[1].layout = objLayout;
+
+                    // Add title at top
+                    doc.content.unshift({
+                        text: 'SLA Report',
+                        style: 'header',
+                        alignment: 'center',
+                        margin: [0, 0, 0, 10],
+                        fontSize: 12,
+                        bold: true
+                    });
                 }
             },
             "print",
             "colvis"
         ],
         initComplete: function(settings, json) {
-            // Hide loader once the DataTable is initialized
             $('#spinnerTopConnChart').hide();
         },
         drawCallback: function(settings) {
-            // Hide loader after each draw (page change, etc.)
             $('#spinnerTopConnChart').hide();
         }
     }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
 });
 </script>
+
+
 
 </body>
 </html>

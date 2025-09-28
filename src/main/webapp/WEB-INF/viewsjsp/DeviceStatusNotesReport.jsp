@@ -5,7 +5,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>SLA Report | DataTables</title>
+<title>Node Status Report | DataTables</title>
 <link rel="shortcut icon" type="image/x-icon"
 	href="<%=request.getContextPath()%>/webtemplate/dist/img/AdminLTELogo.png">
 <meta charset="utf-8">
@@ -64,6 +64,11 @@
 <link rel="stylesheet"
 	href="<%=request.getContextPath()%>/webtemplate/dist/css/adminlte.min.css">
 
+<!-- daterange picker -->
+<link rel="stylesheet"
+	href="<%=request.getContextPath()%>/webtemplate/plugins/daterangepicker/daterangepicker.css">
+
+
 <link rel="stylesheet"
 	href="<%=request.getContextPath()%>/webtemplate/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css">
 
@@ -108,7 +113,7 @@
 					<div class="row mb-2">
 						<div class="col-sm-6">
 
-							<h1>SLA Report</h1>
+							<h1>Node Report</h1>
 
 
 						</div>
@@ -116,7 +121,7 @@
 							<ol class="breadcrumb float-sm-right">
 								<li class="breadcrumb-item"><a href="#">Home</a></li>
 
-								<li class="breadcrumb-item active">SLA Report</li>
+								<li class="breadcrumb-item active">Node Status Report</li>
 
 
 							</ol>
@@ -135,13 +140,13 @@
 							<!-- jquery validation -->
 							<div class="card card-primary">
 								<div class="card-header">
-									<h3 class="card-title">SLA Report</h3>
+									<h3 class="card-title">Node Status Report</h3>
 								</div>
 								<!-- /.card-header -->
 								<!-- form start -->
 								<!--<form id="quickForm">-->
 
-								<form method="post" action="slaReport">
+								<form method="post" action="DeviceStatusViewNotesReport">
 									<div class="card-body">
 										<div class="row">
 											<div class="col-md-6">
@@ -162,27 +167,43 @@
 												</div>
 
 												<div class="form-group">
-													<label for="exampleYearlyCost">Yearly Cost</label> <input
-														type="text" name="yearlyCost" class="form-control"
-														placeholder="Enter Yearly Cost" />
-												</div>
-												
-												<div class="form-group">
-													<label for="examplelocation">Location</label> 
-<!-- 													<input -->
-<!-- 														type="text" name="location" class="form-control" -->
-<!-- 														placeholder="Enter location Cost" /> -->
-														
-														<form:select name="location" id="location" type="text"
-														path="location" class="form-control select2"
-														style="width: 100%;" items="${location}"
-														" />
+													<label for="exampleInputEmail1">Group Name</label>
+													<form:select name="group_name" id="group_name" type="text"
+														path="groupName" class="form-control select2"
+														style="width: 100%;" items="${groupName}"
+														onclick="groupDevices(this);" />
+
+
 												</div>
 											</div>
 
 										</div>
 
 										<br>
+										<table name="example" id="example"
+											class="display compact responsive nowrap stripe"
+											style="width: 100%; display: none;">
+
+											<thead>
+												<tr>
+													<th style="text-align: left">Select</th>
+													<th style="text-align: left">Sr No</th>
+													<th style="text-align: left">Node IP</th>
+													<th style="text-align: left">Node Name</th>
+													<th style="text-align: left">Group Name</th>
+													<th style="text-align: left">Location</th>
+													<th style="text-align: left">District</th>
+													<th style="text-align: left">State</th>
+													<th style="text-align: left">Zone</th>
+												</tr>
+											</thead>
+											<tbody>
+
+											</tbody>
+										</table>
+
+
+
 									</div>
 
 									<div class="card-footer">
@@ -246,6 +267,8 @@
 
 	<script
 		src="<%=request.getContextPath()%>/webtemplate/plugins/sweetalert2/sweetalert2.min.js"></script>
+	<!-- Page specific script -->
+	<script src="<%=request.getContextPath()%>/custom_js/companyMaster.js"></script>
 
 	<!-- Select2 -->
 	<script
@@ -284,7 +307,7 @@ src="<%=request.getContextPath()%>/webtemplate/datatablesJS/jquery.dataTables.js
 
 	<script src="<%=request.getContextPath()%>/webtemplate/js/highstock.js"></script>
 
-	<script src="<%=request.getContextPath()%>/custom_js/slaReport.js"></script>
+	<script src="<%=request.getContextPath()%>/custom_js/nodeReport.js"></script>
 
 
 </body>

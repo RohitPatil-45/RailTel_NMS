@@ -279,6 +279,10 @@
 												<td>Date & Time</td>
 												<td><span id="datetime"></span></td>
 											</tr>
+											<tr>
+												<td>Procured Bandwidth</td>
+												<td><span id="procuredBandwidth"></span></td>
+											</tr>
 
 
 										</tbody>

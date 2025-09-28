@@ -128,6 +128,7 @@ window.onload = function() {
 				document.getElementById('District').textContent = data[0]['District'];
 				document.getElementById('status').textContent = data[0]['status'];
 				document.getElementById('datetime').textContent = data[0]['DateTime'];
+				document.getElementById('procuredBandwidth').textContent = data[0]['Procured_Bandwidth'];
 
 
 				document.getElementById('Version').textContent = data[0]['Version'];

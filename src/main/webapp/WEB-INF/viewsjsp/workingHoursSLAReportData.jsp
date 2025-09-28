@@ -200,7 +200,7 @@
 		src="<%=request.getContextPath()%>/webtemplate/dist/js/adminlte.min.js"></script>
 	<!-- AdminLTE for demo purposes -->
 
-	<!-- Page specific script -->
+	<!-- Page specific script 
 	<script>
 		$(function() {
 			$("#example1").DataTable(
@@ -215,5 +215,49 @@
 					'#example1_wrapper .col-md-6:eq(0)');
 		}); 
 	</script>
+	
+	-->
+
+	<script>
+$(function() {
+    $("#example1").DataTable({
+        data: ${slaReportData},
+        responsive: true,
+        lengthChange: false,
+        autoWidth: false,
+        buttons: [
+            "copy", 
+            "csv", 
+            "excel", 
+            {
+                extend: 'pdfHtml5',
+                orientation: 'landscape',   // force landscape to fit more columns
+                pageSize: 'A3',             // bigger page size for more columns
+                exportOptions: {
+                    columns: ':visible'     // export all visible columns
+                },
+                customize: function (doc) {
+                    doc.defaultStyle.fontSize = 8; // reduce font size
+                    doc.styles.tableHeader.fontSize = 9;
+                    doc.styles.tableHeader.alignment = 'left';
+                    
+                    // Auto-fit columns
+                    var objLayout = {};
+                    objLayout['hLineWidth'] = function(i) { return .5; };
+                    objLayout['vLineWidth'] = function(i) { return .5; };
+                    objLayout['hLineColor'] = function(i) { return '#aaa'; };
+                    objLayout['vLineColor'] = function(i) { return '#aaa'; };
+                    objLayout['paddingLeft'] = function(i) { return 4; };
+                    objLayout['paddingRight'] = function(i) { return 4; };
+                    doc.content[1].layout = objLayout;
+                }
+            },
+            "print",
+            "colvis"
+        ]
+    }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+});
+</script>
+
 </body>
 </html>

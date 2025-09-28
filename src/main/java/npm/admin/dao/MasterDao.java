@@ -259,4 +259,8 @@ public interface MasterDao {
 	Map<String, String> getGroupMapScopeUser();
 
 	String checkPing(String ip);
+
+	
+	
+	Map<String, String> getLocationMap();
 }

@@ -3123,4 +3123,76 @@ public class MasterDaoImpl extends AbstractDao<Integer, UserMasterModel> impleme
 
 	}
 
+//	public Map<String, String> getLocationMap() {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
+
+	public Map<String, String> getLocationMap() {
+		Map<String, String> groupMap = new HashMap<String, String>();
+		String userScopeData = "";
+		List<String> groupNames = null;
+		try {
+			ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+			HttpSession session = attrs.getRequest().getSession();
+			userScopeData = (String) session.getAttribute("userScope");
+
+			groupNames = new ArrayList<String>();
+			try {
+				// Regex to match content inside parentheses in the IN clause
+				String regex = "add_node.location IN \\((.*?)\\)";
+				Pattern pattern = Pattern.compile(regex);
+				Matcher matcher = pattern.matcher(userScopeData);
+
+				if (matcher.find()) {
+					// Extract the content inside parentheses
+					String inClause = matcher.group(1);
+
+					// Split by comma and clean up quotes and whitespace
+					String[] groups = inClause.split(",");
+					for (String group : groups) {
+						groupNames.add(group.trim().replaceAll("'", ""));
+					}
+				}
+			} catch (Exception e) {
+				System.out.println("Error while extracting group names: " + e);
+			}
+
+		} catch (Exception e) {
+			System.out.println("Exceptioon e***" + e);
+
+		}
+		try {
+			Query q = null;
+			String hql = "from LocationMasterModel";
+
+			// Check if groupNames is not null or empty
+			if (groupNames != null && !groupNames.isEmpty()) {
+				hql += " where LOCATION_NAME IN (:groupNames)";
+			}
+
+			// Create the query
+			q = getSession().createQuery(hql);
+
+			// Set the parameter only if groupNames is not null or empty
+			if (groupNames != null && !groupNames.isEmpty()) {
+				q.setParameterList("groupNames", groupNames);
+			}
+			List<LocationMasterModel> listdata = q.list();
+
+			for (LocationMasterModel group : listdata) {
+				groupMap.put("Please Select", "Please Select");
+				groupMap.put("All", "Groups");
+				groupMap.put(group.getLOCATION_NAME(), group.getLOCATION_NAME());
+			}
+
+		} catch (Exception e) {
+
+			System.out.println("Exceptioon e***" + e);
+
+		}
+
+		return groupMap;
+	}
+
 }

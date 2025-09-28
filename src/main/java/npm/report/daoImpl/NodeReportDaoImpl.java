@@ -52,6 +52,7 @@ import npm.model.InterfaceAvailablity;
 import npm.model.InterfaceBWHistory;
 import npm.model.InterfaceMonitoring;
 import npm.model.LatencyHisotryModel;
+import npm.model.ManualTopology;
 import npm.model.NodeAvailablity;
 import npm.model.NodeHealthHistory;
 import npm.model.NodeHealthMonitoring;
@@ -1113,7 +1114,7 @@ public class NodeReportDaoImpl extends AbstractDao<Integer, AddNodeModel> implem
 
 	}
 
-	public JSONArray getSlaReport(String from_date, String to_date, String yearlyCost) {
+	public JSONArray getSlaReport(String from_date, String to_date, String yearlyCost,String location) {
 		JSONArray array = null;
 		JSONArray arrayList = new JSONArray();
 		int penalty_cost_percentage = 0;
@@ -2799,7 +2800,7 @@ public class NodeReportDaoImpl extends AbstractDao<Integer, AddNodeModel> implem
 		Map<String, Map<String, String>> deviceMap = null;
 		try {
 
-			String query001 = "SELECT device_ip, device_name, group_name FROM add_node ";
+			String query001 = "SELECT device_ip, device_name, group_name,location FROM add_node ";
 
 			System.out.println("Query: " + query001);
 
@@ -2817,10 +2818,12 @@ public class NodeReportDaoImpl extends AbstractDao<Integer, AddNodeModel> implem
 				String deviceIp = (String) row[0];
 				String deviceName = (String) row[1];
 				String groupName = (String) row[2];
+				String location = (String) row[3];
 
 				Map<String, String> innerMap = new HashMap<String, String>();
 				innerMap.put("deviceName", deviceName); // Key as deviceName and value as deviceName
 				innerMap.put("groupName", groupName);
+				innerMap.put("location", location);
 				deviceMap.put(deviceIp, innerMap);
 			}
 
@@ -2860,10 +2863,14 @@ public class NodeReportDaoImpl extends AbstractDao<Integer, AddNodeModel> implem
 				Map<String, String> deviceDetails = deviceMap.get(ip);
 				String deviceName = "-";
 				String groupName = "-";
+				String location = "-";
 
 				if (deviceDetails != null) {
 					deviceName = deviceDetails.get("deviceName");
 					groupName = deviceDetails.get("groupName");
+					location = deviceDetails.get("location");
+					
+					
 
 //		            // Print or process the retrieved details.
 //		            System.out.println("IP: " + ip + ", Device Name: " + deviceName + ", Group Name: " + groupName);
@@ -2905,6 +2912,8 @@ public class NodeReportDaoImpl extends AbstractDao<Integer, AddNodeModel> implem
 				array.put(data[0]);
 				array.put(deviceName);
 				array.put(groupName);
+				array.put(location);
+				
 				array.put(var_uptime);
 				array.put(var_Downtime);
 				array.put(df.format(uptimePercentage));
@@ -4561,6 +4570,199 @@ public class NodeReportDaoImpl extends AbstractDao<Integer, AddNodeModel> implem
 
 		} catch (Exception e) {
 			System.err.println("Error fetching notes for ID " + id + ": " + e.getMessage());
+			e.printStackTrace();
+		}
+		return finalarray;
+	}
+
+//	public List<NodeStatusReportBean> DeviceStatusViewNotesReport(String from_date, String to_date,
+//			List<String> ip_list) {
+//		String ip_data = ip_list.toString().replace("[", "").replace("]", "").replace(",", "','").replace(" ", "");
+//		System.out.println("IP List:" + ip_data + ":" + from_date + to_date);
+//		String query = "select report.ID,report.NODE_IP,report.NODE_STATUS,report.EVENT_TIMESTAMP,node.DEVICE_NAME,node.LOCATION,node.DISTRICT,node.STATE,node.ZONE,node.GROUP_NAME from add_node node join node_status_history report on node.DEVICE_IP=report.NODE_IP where node.DEVICE_IP in ('"
+//				+ ip_data + "') and  report.EVENT_TIMESTAMP BETWEEN '" + from_date + "' AND '" + to_date + "'";
+//		System.out.println("query :: " + query);
+//		Query q = getSession().createSQLQuery(query);
+//		List<NodeStatusReportBean> dataList = new ArrayList<NodeStatusReportBean>();
+//
+//		List<Object[]> data = q.list();
+//		System.out.println("Size Data:" + data.size());
+//		long id = 0;
+//		for (Object[] a : data) {
+//			id++;
+//			NodeStatusReportBean bean = new NodeStatusReportBean();
+//			bean.setID(id);
+//			bean.setNODE_IP((a[1] == null) ? "-" : a[1].toString().equals("") ? "-" : a[1].toString());
+//			bean.setNODE_STATUS((a[2] == null) ? "-" : a[2].toString().equals("") ? "-" : a[2].toString());
+//			bean.setEVENT_TIMESTAMP((a[3] == null) ? "-" : a[3].toString().equals("") ? "-" : a[3].toString());
+//			bean.setDEVICE_NAME((a[4] == null) ? "-" : a[4].toString().equals("") ? "-" : a[4].toString());
+//			bean.setLOCATION((a[5] == null) ? "-" : a[5].toString().equals("") ? "-" : a[5].toString());
+//			bean.setDISTRICT((a[6] == null) ? "-" : a[6].toString().equals("") ? "-" : a[6].toString());
+//			bean.setSTATE((a[7] == null) ? "-" : a[7].toString().equals("") ? "-" : a[7].toString());
+//			bean.setZONE((a[8] == null) ? "-" : a[8].toString().equals("") ? "-" : a[8].toString());
+//			bean.setGROUP_NAME((a[9] == null) ? "-" : a[9].toString().equals("") ? "-" : a[9].toString());
+//			String Id = (a[0] == null) ? "-" : a[0].toString().equals("") ? "-" : a[0].toString();
+//
+//			String q1 = "from Add_Node_Notes WHERE STATUS_ID='" + id + "'";
+//
+//			Query qrynotes = getSession().createQuery(q1);
+//
+//			List<Add_Node_Notes> qrylist = qrynotes.list();
+//
+//			for (Add_Node_Notes list : qrylist) {
+//				JSONArray array = new JSONArray();
+//				String NOTES = list.getNOTES();
+//				Date EventTimestamp = list.getEventTimestamp();
+//
+//				bean.setVIEW_NOTES((NOTES == null) ? "-" : NOTES.toString().equals("") ? "-" : NOTES.toString());
+//				bean.setADD_NOTES((EventTimestamp == null) ? "-"
+//						: EventTimestamp.toString().equals("") ? "-" : EventTimestamp.toString());
+//			}
+//
+//			dataList.add(bean);
+//		}
+//
+//		return dataList;
+//	}
+
+	public List<NodeStatusReportBean> DeviceStatusViewNotesReport(String from_date, String to_date,
+			List<String> ip_list) {
+
+		String ip_data = ip_list.toString().replace("[", "").replace("]", "").replace(",", "','").replace(" ", "");
+		System.out.println("IP List:" + ip_data + ":" + from_date + to_date);
+
+		String query = "select report.ID,report.NODE_IP,report.NODE_STATUS,report.EVENT_TIMESTAMP,"
+				+ "node.DEVICE_NAME,node.LOCATION,node.DISTRICT,node.STATE,node.ZONE,node.GROUP_NAME "
+				+ "from add_node node " + "join node_status_history report on node.DEVICE_IP=report.NODE_IP "
+				+ "where node.DEVICE_IP in ('" + ip_data + "') " + "and report.EVENT_TIMESTAMP BETWEEN '" + from_date
+				+ "' AND '" + to_date + "'";
+
+		System.out.println("query :: " + query);
+
+		Query q = getSession().createSQLQuery(query);
+		List<NodeStatusReportBean> dataList = new ArrayList<>();
+
+		List<Object[]> data = q.list();
+		System.out.println("Size Data:" + data.size());
+		long srno = 0;
+
+		for (Object[] a : data) {
+			srno++;
+			NodeStatusReportBean bean = new NodeStatusReportBean();
+			bean.setID(srno);
+			bean.setNODE_IP((a[1] == null || a[1].toString().isEmpty()) ? "-" : a[1].toString());
+			bean.setNODE_STATUS((a[2] == null || a[2].toString().isEmpty()) ? "-" : a[2].toString());
+			bean.setEVENT_TIMESTAMP((a[3] == null || a[3].toString().isEmpty()) ? "-" : a[3].toString());
+			bean.setDEVICE_NAME((a[4] == null || a[4].toString().isEmpty()) ? "-" : a[4].toString());
+			bean.setLOCATION((a[5] == null || a[5].toString().isEmpty()) ? "-" : a[5].toString());
+			bean.setDISTRICT((a[6] == null || a[6].toString().isEmpty()) ? "-" : a[6].toString());
+			bean.setSTATE((a[7] == null || a[7].toString().isEmpty()) ? "-" : a[7].toString());
+			bean.setZONE((a[8] == null || a[8].toString().isEmpty()) ? "-" : a[8].toString());
+			bean.setGROUP_NAME((a[9] == null || a[9].toString().isEmpty()) ? "-" : a[9].toString());
+
+			// real DB id from report
+			String reportId = (a[0] == null || a[0].toString().isEmpty()) ? null : a[0].toString();
+
+			if (reportId != null) {
+				// fetch notes for this report id
+				String q1 = "from Add_Node_Notes WHERE STATUS_ID='" + reportId + "'";
+				Query qrynotes = getSession().createQuery(q1);
+				List<Add_Node_Notes> qrylist = qrynotes.list();
+
+				if (qrylist != null && !qrylist.isEmpty()) {
+					StringBuilder htmlTable = new StringBuilder();
+
+					// Start table
+					htmlTable.append("<table border='1' cellspacing='0' cellpadding='4' ")
+							.append("style='border-collapse:collapse;width:100%;font-size:12px;'>");
+
+					// Header row
+
+					// Data rows
+					for (Add_Node_Notes list : qrylist) {
+						String notes = (list.getNOTES() == null || list.getNOTES().isEmpty()) ? "-" : list.getNOTES();
+						String ts = (list.getEventTimestamp() == null) ? "-" : list.getEventTimestamp().toString();
+
+						htmlTable.append("<tr>").append("<td>").append(ts).append("</td>").append("<td>").append(notes)
+								.append("</td>").append("</tr>");
+					}
+
+					htmlTable.append("</table>");
+
+					bean.setVIEW_NOTES(htmlTable.toString());
+//					bean.setADD_NOTES(""); // not required separately now
+				} else {
+					bean.setVIEW_NOTES("-");
+//					bean.setADD_NOTES("-");
+				}
+			} else {
+				bean.setVIEW_NOTES("-");
+//				bean.setADD_NOTES("-");
+			}
+
+			dataList.add(bean);
+		}
+
+		return dataList;
+	}
+
+	public String Deleteview_topology(String id) {
+		try {
+			Long topologyId = Long.parseLong(id); // Convert String ID to Long
+
+			String hql = "delete from ManualTopology where Id = :id";
+			Query query = getSession().createQuery(hql);
+			query.setParameter("id", topologyId);
+			int result = query.executeUpdate();
+
+			if (result > 0) {
+				return "success";
+			} else {
+				return "Topology not found";
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "error: " + e.getMessage();
+		}
+	}
+
+	public JSONArray getview_topology(String userScopeData) {
+		JSONArray finalarray = new JSONArray();
+		int sr = 0;
+		try {
+
+			String q = "from ManualTopology";
+
+			Query qrynotes = getSession().createQuery(q);
+
+			List<ManualTopology> qrylist = qrynotes.list();
+
+			for (ManualTopology list : qrylist) {
+				JSONArray array = new JSONArray();
+				Long Id = list.getId();
+				String Source_device_name = list.getSource_device_name();
+				String Source_interface_name = list.getSource_interface_name();
+				String Destination_device_name = list.getDestination_device_name();
+				String Destination_interface_name = list.getDestination_interface_name();
+
+				sr++;
+				array.put(sr);
+				array.put(Source_device_name);
+				array.put(Source_interface_name);
+				array.put(Destination_device_name);
+				array.put(Destination_interface_name);
+				array.put(
+						"<button class='btn btn-sm btn-danger' id='Delete'  name='Doem' onclick='Deleteview_topology(\""
+								+ Id + "\" )'><i class='fa fa-trash'></i></button>");
+				finalarray.put(array);
+
+				System.out.println("finalarray ::" + finalarray);
+
+			}
+
+		} catch (Exception e) {
+			System.err.println("Error getview_topology notes for ID " + e.getMessage());
 			e.printStackTrace();
 		}
 		return finalarray;

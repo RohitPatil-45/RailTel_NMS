@@ -77,7 +77,7 @@ public interface NodeReportService {
 
 	List<DeviceAlertLog> viewDeviceAlertLog();
 
-	JSONArray getSlaReport(String from_date, String to_date, String yearlyCost);
+	JSONArray getSlaReport(String from_date, String to_date, String yearlyCost,String location);
 
 	JSONArray getAvgUptimeReport(String from_date, String to_date);
 
@@ -186,4 +186,10 @@ public interface NodeReportService {
 	String saveNodeStatusNotes(String id, String notes);
 
 	JSONArray getDevicenNotesInfo(String id);
+
+	List<NodeStatusReportBean> DeviceStatusViewNotesReport(String from_date, String to_date, List<String> list);
+
+	String Deleteview_topology(String id);
+
+	JSONArray getview_topology(String userScopeData);
 }

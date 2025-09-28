@@ -271,10 +271,10 @@ public class NodeDetailsDaoImpl extends AbstractDao<Integer, AddNodeModel> imple
 					jsonObject.put("oper_status",
 							"<small class='text-danger mr-1'> <i class='fas fa-arrow-down'></i> Down </small>");
 				}
-				
+
 				jsonObject.put("adminStatus", (data.getADMIN_STATUS() == null) ? "NA"
 						: data.getADMIN_STATUS().equals("") ? "NA" : data.getADMIN_STATUS());
-				
+
 				jsonObject.put("operStatus", (data.getOPER_STATUS() == null) ? "NA"
 						: data.getOPER_STATUS().equals("") ? "NA" : data.getOPER_STATUS());
 
@@ -314,7 +314,7 @@ public class NodeDetailsDaoImpl extends AbstractDao<Integer, AddNodeModel> imple
 				jsonObjData.put("NodeNAme", list.getDEVICE_NAME());
 				jsonObjData.put("Location", list.getLOCATION());
 				jsonObjData.put("Company", list.getCOMPANY());
-//				jsonObj.put("State", list.getSTATE());
+				jsonObjData.put("Procured_Bandwidth", list.getProcured_Bandwidth());
 				jsonObjData.put("District", list.getDISTRICT());
 			}
 		} catch (Exception e) {
@@ -336,7 +336,7 @@ public class NodeDetailsDaoImpl extends AbstractDao<Integer, AddNodeModel> imple
 				jsonObjData.put("temperature", list.getTEMPERATURE());
 				jsonObjData.put("DeviceName", list.getNODE_NAME());
 				jsonObjData.put("SerialNo", list.getSERIAL_NO());
-				
+
 			}
 		} catch (Exception e) {
 			System.out.println("Exception:" + e);

@@ -7,12 +7,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Device Availability Report | DataTables</title>
+<title>Manual Topology Viewer | DataTables</title>
 <link rel="shortcut icon" type="image/x-icon"
 	href="<%=request.getContextPath()%>/webtemplate/dist/img/AdminLTELogo.png">
 <!-- Google Font: Source Sans Pro -->
-<!-- <link rel="stylesheet" -->
-<!-- 	href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback"> -->
 <link rel="stylesheet"
 	href="<%=request.getContextPath()%>/webtemplate/OfflineCss/googleapifamily.css">
 <!-- Font Awesome -->
@@ -25,12 +23,8 @@
 	href="<%=request.getContextPath()%>/webtemplate/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
 <link rel="stylesheet"
 	href="<%=request.getContextPath()%>/webtemplate/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
-
 <link rel="stylesheet"
 	href="<%=request.getContextPath()%>/webtemplate/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css">
-
-
-
 <!-- Theme style -->
 <link rel="stylesheet"
 	href="<%=request.getContextPath()%>/webtemplate/dist/css/adminlte.min.css">
@@ -43,6 +37,41 @@
 	height: 100%;
 	background-color: rgba(255, 255, 255, 0.9);
 	z-index: 1000;
+}
+
+.swal2-validation-message {
+	width: 112%;
+	margin-left: -26px;
+}
+
+.topology-graph {
+	width: 100%;
+	height: 400px;
+	border: 1px solid #ddd;
+	margin-bottom: 20px;
+	background-color: #f9f9f9;
+}
+
+.topology-controls {
+	margin-bottom: 15px;
+	padding: 10px;
+	background-color: #f5f5f5;
+	border-radius: 5px;
+}
+
+.node-up {
+	color: green;
+	font-weight: bold;
+}
+
+.node-down {
+	color: red;
+	font-weight: bold;
+}
+
+.node-warning {
+	color: orange;
+	font-weight: bold;
 }
 </style>
 </head>
@@ -61,16 +90,14 @@
 				<div class="container-fluid">
 					<div class="row mb-2">
 						<div class="col-sm-6">
-							<h1>Device Availability Report - Working Hours</h1>
+							<h1>Manual Topology Viewer</h1>
 						</div>
 						<div class="col-sm-6">
 							<ol class="breadcrumb float-sm-right">
 								<li class="breadcrumb-item"><a
-									href="<%=request.getContextPath()%>/nodeReport/availabilityReportForm">Device
-										Availability Report</a></li>
-								<li class="breadcrumb-item active">View Report</li>
-
-
+									href="<%=request.getContextPath()%>/topology/view">Network
+										Topology</a></li>
+								<li class="breadcrumb-item active">Manual Topology Viewer</li>
 							</ol>
 						</div>
 					</div>
@@ -87,10 +114,7 @@
 
 							<div class="card">
 								<div class="card-header">
-									<h3 class="card-title">Device Availability Report</h3>
-									&nbsp; &nbsp; &nbsp;<b>From Date :</b> ${fdate} <b>&nbsp;
-										&nbsp; &nbsp;To Date :</b> ${tdate}
-
+									<h3 class="card-title">Network Topology Details</h3>
 								</div>
 								<!-- /.card-header -->
 								<div class="card-body">
@@ -101,40 +125,20 @@
 										</center>
 									</div>
 
-
-									<table id="example1" class="table table-bordered table-striped">
+									<table id="topologyTable"
+										class="table table-bordered table-striped">
 										<thead>
 											<tr>
 												<th>Sr No</th>
-												<th>Device IP</th>
-												<th>Device Name</th>
-												<th>Group Name</th>
-												<th>Location</th>
-												<th>Uptime Hours</th>
-												<th>Downtime Hours</th>
-												<th>Uptime Percentage</th>
-												<th>Downtime Percentage</th>
+												<th>Source Device Name</th>
+												<th>Source Interface Name</th>
+												<th>Destination Device Name</th>
+												<th>Destination Device Name Interface Name</th>
+												<th>Actions</th>
 											</tr>
 										</thead>
-										<tbody>
-										</tbody>
-										<tfoot>
-											<tr>
-												<th>Sr No</th>
-												<th>Device IP</th>
-												<th>Device Name</th>
-												<th>Group Name</th>
-												<th>Location</th>
-												<th>Uptime Hours</th>
-												<th>Downtime Hours</th>
-												<th>Uptime Percentage</th>
-												<th>Downtime Percentage</th>
-											</tr>
-										</tfoot>
 
 									</table>
-
-
 								</div>
 								<!-- /.card-body -->
 							</div>
@@ -148,22 +152,17 @@
 			</section>
 			<!-- /.content -->
 		</div>
-		<!-- /.content-wrapper -->
+
+		<!-- Node Details Modal -->
+
+
 		<!-- Footer  -->
 		<jsp:include page="footer.jsp" />
 		<!-- /. Footer -->
-
-		<!-- Control Sidebar -->
-		<aside class="control-sidebar control-sidebar-dark">
-			<!-- Control sidebar content goes here -->
-		</aside>
-		<!-- /.control-sidebar -->
 	</div>
 	<!-- ./wrapper -->
 
 	<!-- jQuery -->
-	<script
-		src="<%=request.getContextPath()%>/webtemplate/plugins/sweetalert2/sweetalert2.min.js"></script>
 	<script
 		src="<%=request.getContextPath()%>/webtemplate/plugins/jquery/jquery.min.js"></script>
 	<!-- Bootstrap 4 -->
@@ -194,35 +193,15 @@
 		src="<%=request.getContextPath()%>/webtemplate/plugins/datatables-buttons/js/buttons.print.min.js"></script>
 	<script
 		src="<%=request.getContextPath()%>/webtemplate/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
-
+	<script
+		src="<%=request.getContextPath()%>/webtemplate/plugins/sweetalert2/sweetalert2.min.js"></script>
 	<!-- AdminLTE App -->
 	<script
 		src="<%=request.getContextPath()%>/webtemplate/dist/js/adminlte.min.js"></script>
-	<!-- AdminLTE for demo purposes -->
 
-	<!-- Page specific script -->
-	<script>
-	$(function() {
-		$('#example1').DataTable({
-			data : ${availabilityReport},
-			lengthChange : false,
-			autoWidth : false,
-			"pageLength" : 10,
-			scrollX : true,
-			scrollY : true,
-			"buttons": ["copy", "csv", "excel", "print",
-				"colvis"],
-			"initComplete" : function(settings, json) {
-				// Hide loader once the DataTable is initialized
-				$('#spinnerTopConnChart').hide();
-			},
-			"drawCallback" : function(settings) {
-				// Hide loader after each draw (page change, etc.)
-				$('#spinnerTopConnChart').hide();
-			}
-		}).buttons().container().appendTo(
-		'#example1_wrapper .col-md-6:eq(0)');
-	});
-	</script>
+	<script
+		src="<%=request.getContextPath()%>/custom_js/ManualTopogyList.js"></script>
+
+
 </body>
 </html>
