@@ -110,8 +110,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
 								<li><a tabindex="-1"
 									href="<%=request.getContextPath()%>/master/viewManualTopology"
 									class="dropdown-item">Manual Topology</a></li>
-									
-									<li><a tabindex="-1"
+								<li class="dropdown-divider"></li>
+								<li><a tabindex="-1"
 									href="<%=request.getContextPath()%>/nodeReport/ManualTologyList"
 									class="dropdown-item">Manual Topology List</a></li>
 								<%
@@ -437,7 +437,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 								%> --%>
 
 								<!-- 								server dropdown -->
-							<%-- 	<li class="dropdown-submenu dropdown-hover"><a
+								<%-- 	<li class="dropdown-submenu dropdown-hover"><a
 									id="adminDropdownSubMenu1" href="#" role="button"
 									data-toggle="dropdown" aria-haspopup="true"
 									aria-expanded="false" class="dropdown-item dropdown-toggle">Server
