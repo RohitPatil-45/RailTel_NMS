@@ -4448,7 +4448,7 @@ public class NodeReportDaoImpl extends AbstractDao<Integer, AddNodeModel> implem
 		try {
 			String query = "SELECT\r\n" + "	an.DEVICE_NAME,\r\n" + "	d.device_ip,\r\n" + "	an.GROUP_NAME,\r\n"
 					+ "   an.LOCATION,\r\n" + "	an.DISTRICT,	 \r\n" + "	an.STATE,	 \r\n"
-					+ "	d.uptime_seconds,\r\n" + "	d.downtime_seconds\r\n" + "FROM\r\n" + "(\r\n" + "    SELECT\r\n"
+					+ "	d.uptime_seconds,\r\n" + "	d.downtime_seconds, an.Procured_Bandwidth\r\n" + "FROM\r\n" + "(\r\n" + "    SELECT\r\n"
 					+ "        device_ip,\r\n"
 					+ "        SUM(CASE WHEN status = 'Up' THEN total_duration_seconds ELSE 0 END) AS uptime_seconds,\r\n"
 					+ "        SUM(CASE WHEN status = 'Down' THEN total_duration_seconds ELSE 0 END) AS downtime_seconds\r\n"
@@ -4509,6 +4509,7 @@ public class NodeReportDaoImpl extends AbstractDao<Integer, AddNodeModel> implem
 				array.put(var_Downtime);
 				array.put(df.format(uptimePercentage));
 				array.put(df.format(downtimePercentage));
+				array.put(obj[8].toString());
 				arrayList.put(array);
 			}
 

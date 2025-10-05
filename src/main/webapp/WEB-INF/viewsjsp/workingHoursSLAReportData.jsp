@@ -226,22 +226,39 @@ $(function() {
         lengthChange: false,
         autoWidth: false,
         buttons: [
-            "copy", 
-            "csv", 
-            "excel", 
+            "copy",
+            "csv",
+            "excel",
             {
                 extend: 'pdfHtml5',
-                orientation: 'landscape',   // force landscape to fit more columns
-                pageSize: 'A3',             // bigger page size for more columns
+                orientation: 'landscape',
+                pageSize: 'A3',
+                title: '', // disable default title (we’ll add our own)
                 exportOptions: {
-                    columns: ':visible'     // export all visible columns
+                    columns: ':visible'
                 },
                 customize: function (doc) {
-                    doc.defaultStyle.fontSize = 8; // reduce font size
+                    // Get your dynamic values from JSP
+                    var reportTitle = "Device SLA Report";
+                    var fromDate = "${fdate}";
+                    var toDate = "${tdate}";
+                    
+                    // Add header at the top of PDF
+                    doc.content.splice(0, 0, {
+                        margin: [0, 0, 0, 12],
+                        alignment: 'center',
+                        stack: [
+                            { text: reportTitle, fontSize: 14, bold: true, margin: [0, 5, 0, 5] },
+                            { text: 'From Date: ' + fromDate + '     To Date: ' + toDate, fontSize: 10, margin: [0, 2, 0, 5] }
+                        ]
+                    });
+
+                    // Reduce font size for the table
+                    doc.defaultStyle.fontSize = 8;
                     doc.styles.tableHeader.fontSize = 9;
                     doc.styles.tableHeader.alignment = 'left';
-                    
-                    // Auto-fit columns
+
+                    // Add subtle borders
                     var objLayout = {};
                     objLayout['hLineWidth'] = function(i) { return .5; };
                     objLayout['vLineWidth'] = function(i) { return .5; };

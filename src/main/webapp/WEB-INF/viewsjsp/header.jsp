@@ -215,7 +215,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
 										<li><a tabindex="-1"
 											href="<%=request.getContextPath()%>/master/slaMainMaster"
-											class="dropdown-item">SLA Master</a></li>
+											class="dropdown-item">SLA Master Data</a></li>
 
 
 										<li><a tabindex="-1" style="display: none;"
@@ -261,7 +261,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 											href="<%=request.getContextPath()%>/node/viewconfigBackupdata"
 											class="dropdown-item">View Configuration Backup</a></li>
 
-										<li><a tabindex="-1"
+										<%-- <li><a tabindex="-1"
 											href="<%=request.getContextPath()%>/node/nodeSpeedTest"
 											class="dropdown-item">Speed Test</a></li>
 
@@ -271,7 +271,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 										<li><a tabindex="-1"
 											href="<%=request.getContextPath()%>/node/bgpAlerts"
 											class="dropdown-item">BGP Alerts</a></li>
-
+ --%>
 									</ul></li>
 								<%
 								}
@@ -432,12 +432,12 @@ scratch. This page gets rid of all links and provides the needed markup only.
 							aria-expanded="false" class="nav-link dropdown-toggle">Report</a>
 							<ul aria-labelledby="adminDropdownSubMenu"
 								class="dropdown-menu border-0 shadow" style="width: max-content">
-								<%
+								<%-- <%
 								if (reportScope.contains("Server_Report")) {
-								%>
+								%> --%>
 
 								<!-- 								server dropdown -->
-								<li class="dropdown-submenu dropdown-hover"><a
+							<%-- 	<li class="dropdown-submenu dropdown-hover"><a
 									id="adminDropdownSubMenu1" href="#" role="button"
 									data-toggle="dropdown" aria-haspopup="true"
 									aria-expanded="false" class="dropdown-item dropdown-toggle">Server
@@ -502,11 +502,11 @@ scratch. This page gets rid of all links and provides the needed markup only.
 											class="dropdown-item">Average Uptime Report</a></li>
 
 
-									</ul></li>
+									</ul></li> --%>
 
 
 								<%
-								}
+								/* } */
 								if (reportScope.contains("Node_Report")) {
 								%>
 
@@ -564,7 +564,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 										<li><a tabindex="-1"
 											href="<%=request.getContextPath()%>/nodeReport/nodeMonitoringView"
 											class="dropdown-item">Node Monitoring</a></li>
-										<li><a tabindex="-1"
+										<%-- <li><a tabindex="-1"
 											href="<%=request.getContextPath()%>/nodeReport/serviceReport"
 											class="dropdown-item">Service Report</a></li>
 
@@ -572,15 +572,13 @@ scratch. This page gets rid of all links and provides the needed markup only.
 										<li><a tabindex="-1"
 											href="<%=request.getContextPath()%>/nodeReport/deviceAlertLog"
 											class="dropdown-item">Device Alert Log</a></li>
-
-
 										<li><a tabindex="-1"
 											href="<%=request.getContextPath()%>/nodeReport/slaReportForm"
 											class="dropdown-item">SLA Report</a></li>
 
 										<li><a tabindex="-1"
 											href="<%=request.getContextPath()%>/nodeReport/syslogReportForm"
-											class="dropdown-item">Syslog Report</a></li>
+											class="dropdown-item">Syslog Report</a></li>--%>
 
 										<li><a tabindex="-1"
 											href="<%=request.getContextPath()%>/nodeReport/avgAvailabilityReportForm"
@@ -594,9 +592,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
 											href="<%=request.getContextPath()%>/nodeReport/avgUptimeForm"
 											class="dropdown-item">Average Uptime Report</a></li>
 
-										<li><a tabindex="-1"
+										<%-- <li><a tabindex="-1"
 											href="<%=request.getContextPath()%>/nodeReport/connectedDevices"
-											class="dropdown-item">Node Connected Devices</a></li>
+											class="dropdown-item">Node Connected Devices</a></li> --%>
 									</ul></li>
 								<%
 								}
@@ -741,22 +739,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
 											class="dropdown-item">Top Protocol Wise</a></li>
 									</ul></li>
 
-								<%
-								}
-								if (reportScope.contains("Event_Report")) {
-								%>
-
-								<li class="dropdown-submenu dropdown-hover"><a
-									id="adminDropdownSubMenu1" href="#" role="button"
-									data-toggle="dropdown" aria-haspopup="true"
-									aria-expanded="false" class="dropdown-item dropdown-toggle">Event
-										Report</a>
-									<ul aria-labelledby="adminDropdownSubMenu1"
-										class="dropdown-menu border-0 shadow">
-										<li><a tabindex="-1"
-											href="<%=request.getContextPath()%>/nodeReport/windowsEvent"
-											class="dropdown-item">Windows Events</a></li>
-									</ul></li>
 								<%
 								}
 								%>

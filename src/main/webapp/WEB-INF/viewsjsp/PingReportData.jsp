@@ -257,6 +257,19 @@ td, th {
 											<td colspan="3">${fDate}<b>-</b> ${toDate}
 											</td>
 										</tr>
+										
+										<tr>
+											<td class="label">IP Address:</td>
+											<td colspan="3">${ipAddress}
+											</td>
+										</tr>
+										
+										<tr>
+											<td class="label">Procure Bandwidth:</td>
+											<td colspan="3" id="procureBw"></td>
+											</td>
+										</tr>
+										
 										<tr>
 											<td class="label">Sensor Type:</td>
 											<td colspan="3">Ping (60 s Interval)</td>
@@ -583,6 +596,7 @@ td, th {
 				$('#probeGroupDevice').html(location + " - "+group+" - "+device);
 				$('#uptimeCell').html(uptimeText);
 				$('#downtimeCell').html(downtimeText);
+				$('#procureBw').html(row[10]);
 			}
 			
 			
