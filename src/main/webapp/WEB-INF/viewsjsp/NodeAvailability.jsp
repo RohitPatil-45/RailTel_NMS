@@ -165,7 +165,7 @@
 													</div>
 												</div>
 												<div class="form-group">
-													<label for="exampleInputEmail1">Group Name</label>
+													<label for="exampleInputEmail1">Location Name</label>
 													<form:select name="group_name" id="group_name" type="text"
 														path="groupName" class="form-control select2"
 														style="width: 100%;" items="${groupName}"

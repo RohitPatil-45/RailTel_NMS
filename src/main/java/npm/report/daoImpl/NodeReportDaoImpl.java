@@ -487,6 +487,47 @@ public class NodeReportDaoImpl extends AbstractDao<Integer, AddNodeModel> implem
 		System.out.println(array1);
 		return array1;
 	}
+	
+	
+	public JSONArray getLocationDeviceDetails(String group_name, String userScopeData) {
+		JSONArray array = null;
+		JSONArray array1 = new JSONArray();
+		try {
+			System.out.println("Query:" + group_name);
+			String queryText = "";
+			Query q = null;
+			if (group_name.equals("All")) {
+				queryText = "from AddNodeModel add_node where " + userScopeData;
+				q = getSession().createQuery(queryText);
+			} else {
+				queryText = "from AddNodeModel add_node where add_node.LOCATION=:GROUP_NAME AND " + userScopeData;
+				q = getSession().createQuery(queryText);
+				q.setParameter("GROUP_NAME", group_name);
+			}
+
+			int srno = 0;
+			List<AddNodeModel> dataList = q.list();
+			for (AddNodeModel node : dataList) {
+				srno = srno + 1;
+				array = new JSONArray();
+				array.put("<input type='checkbox' id=" + node.getDEVICE_IP()
+						+ " name='ipAddressCheck' class='checkers' value='" + node.getDEVICE_IP() + "'/>");
+				array.put(srno);
+				array.put(node.getDEVICE_IP());
+				array.put(node.getDEVICE_NAME());
+				array.put(node.getGROUP_NAME());
+				array.put(node.getLOCATION());
+				array.put(node.getDISTRICT());
+				array.put(node.getSTATE());
+				array.put(node.getZONE());
+				array1.put(array);
+			}
+		} catch (Exception e) {
+			System.out.println("Exception:" + e);
+		}
+		System.out.println(array1);
+		return array1;
+	}
 
 	// Average latency Graph
 	public JSONObject latencyHistoricalData(String from_date, String to_date, String ip_address) {

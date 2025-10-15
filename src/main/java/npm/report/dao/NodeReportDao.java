@@ -204,4 +204,6 @@ public interface NodeReportDao {
 
 	JSONArray getview_topology(String userScopeData);
 
+	JSONArray getLocationDeviceDetails(String group_name, String userScopeData);
+
 }

@@ -218,7 +218,7 @@
 	
 	-->
 
-	<script>
+<!-- 	<script> 
 $(function() {
     $("#example1").DataTable({
         data: ${slaReportData},
@@ -274,6 +274,271 @@ $(function() {
         ]
     }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
 });
+</script>
+-->
+
+<script>
+$(function() {
+    $("#example1").DataTable({
+        data: ${slaReportData},
+        responsive: true,
+        lengthChange: false,
+        autoWidth: false,
+        dom: 'Bfrtip',
+        buttons: [
+            {
+                extend: 'copy',
+                title: '',
+                exportOptions: {
+                    columns: ':visible'
+                }
+            },
+            {
+                extend: 'csv',
+                title: '',
+                exportOptions: {
+                    columns: ':visible'
+                },
+                customize: function (csv) {
+                    // Add custom header to CSV
+                    var customHeader = 'Customer Name:\tTamil Nadu State Marketing Corporation\n' +
+                                     'Event Timestamp\n' +
+                                     '\tfrom\tto\n' +
+                                     'Date\t' + "${fdate}" + '\t' + "${tdate}" + '\n' +
+                                     'No. of Days\t' + calculateDays("${fdate}", "${tdate}") + '\n\n';
+                    return customHeader + csv;
+                }
+            },
+            {
+                extend: 'excel',
+                title: '',
+                filename: 'Device_SLA_Report',
+                exportOptions: {
+                    columns: ':visible'
+                },
+                customize: function (xlsx) {
+                    var sheet = xlsx.xl.worksheets['sheet1.xml'];
+                    
+                    // Get the sheet data
+                    var sheetData = $('sheetData', sheet);
+                    
+                    // First, let's find and store the original table header and data
+                    var originalRows = $('row', sheetData).toArray();
+                    
+                    // Clear the sheet data
+                    sheetData.empty();
+                    
+                    // Add custom header rows
+                    var customRows = [
+                        // Row 1: Customer Name
+                        '<row r="1">' +
+                        '<c r="A1" t="inlineStr"><is><t>Customer Name:</t></is></c>' +
+                        '<c r="B1" t="inlineStr"><is><t>Tamil Nadu State Marketing Corporation</t></is></c>' +
+                        '</row>',
+                        
+                        // Row 2: Event Timestamp
+                        '<row r="2">' +
+                        '<c r="A2" t="inlineStr"><is><t>Event Timestamp</t></is></c>' +
+                        '</row>',
+                        
+                        // Row 3: from/to headers
+                        '<row r="3">' +
+                        '<c r="A3" t="inlineStr"><is><t></t></is></c>' +
+                        '<c r="B3" t="inlineStr"><is><t>from</t></is></c>' +
+                        '<c r="C3" t="inlineStr"><is><t>to</t></is></c>' +
+                        '</row>',
+                        
+                        // Row 4: Dates
+                        '<row r="4">' +
+                        '<c r="A4" t="inlineStr"><is><t>Date</t></is></c>' +
+                        '<c r="B4" t="inlineStr"><is><t>' + "${fdate}" + '</t></is></c>' +
+                        '<c r="C4" t="inlineStr"><is><t>' + "${tdate}" + '</t></is></c>' +
+                        '</row>',
+                        
+                        // Row 5: No. of Days
+                        '<row r="5">' +
+                        '<c r="A5" t="inlineStr"><is><t>No. of Days</t></is></c>' +
+                        '<c r="B5" t="inlineStr"><is><t>' + calculateDays("${fdate}", "${tdate}") + '</t></is></c>' +
+                        '</row>',
+                        
+                        // Row 6: Empty row for spacing
+                        '<row r="6"></row>'
+                    ];
+                    
+                    // Add custom rows to sheet
+                    customRows.forEach(function(rowHtml) {
+                        sheetData.append(rowHtml);
+                    });
+                    
+                    // Now add the original table data, adjusting row numbers
+                    var rowOffset = 6; // We added 6 custom rows
+                    
+                    originalRows.forEach(function(row, index) {
+                        var $row = $(row);
+                        var newRowNumber = index + rowOffset + 1;
+                        
+                        // Update row number
+                        $row.attr('r', newRowNumber);
+                        
+                        // Update all cell references in this row
+                        $('c', $row).each(function() {
+                            var $cell = $(this);
+                            var cellRef = $cell.attr('r');
+                            var column = cellRef.replace(/[0-9]/g, '');
+                            var newCellRef = column + newRowNumber;
+                            $cell.attr('r', newCellRef);
+                        });
+                        
+                        sheetData.append($row);
+                    });
+                }
+            },
+            {
+                extend: 'pdfHtml5',
+                orientation: 'landscape',
+                pageSize: 'A3',
+                title: '',
+                exportOptions: {
+                    columns: ':visible'
+                },
+                customize: function (doc) {
+                    // Get your dynamic values
+                    var fromDate = "${fdate}";
+                    var toDate = "${tdate}";
+                    var daysCount = calculateDays(fromDate, toDate);
+                    
+                    // Add custom header at the top of PDF
+                    doc.content.splice(0, 0, {
+                        margin: [0, 0, 0, 12],
+                        alignment: 'left',
+                        table: {
+                            widths: ['auto', '*', 'auto', '*'],
+                            body: [
+                                [
+                                    { text: 'Customer Name:', bold: true, fontSize: 10 },
+                                    { text: 'Tamil Nadu State Marketing Corporation', fontSize: 10, colSpan: 3 },
+                                    {},
+                                    {}
+                                ],
+                                [
+                                    { text: 'Event Timestamp', bold: true, fontSize: 10, colSpan: 4 },
+                                    {},
+                                    {},
+                                    {}
+                                ],
+                                [
+                                    { text: '', fontSize: 9 },
+                                    { text: 'from', bold: true, fontSize: 9, alignment: 'center' },
+                                    { text: 'to', bold: true, fontSize: 9, alignment: 'center' },
+                                    { text: '', fontSize: 9 }
+                                ],
+                                [
+                                    { text: 'Date', bold: true, fontSize: 9 },
+                                    { text: fromDate, fontSize: 9, alignment: 'center' },
+                                    { text: toDate, fontSize: 9, alignment: 'center' },
+                                    { text: '', fontSize: 9 }
+                                ],
+                                [
+                                    { text: 'No. of Days', bold: true, fontSize: 9 },
+                                    { text: daysCount.toString(), fontSize: 9, alignment: 'center' },
+                                    { text: '', fontSize: 9, colSpan: 2 },
+                                    {}
+                                ]
+                            ]
+                        },
+                        layout: {
+                            hLineWidth: function(i, node) { return 0.5; },
+                            vLineWidth: function(i, node) { return 0.5; },
+                            hLineColor: function(i, node) { return '#aaaaaa'; },
+                            vLineColor: function(i, node) { return '#aaaaaa'; },
+                            paddingLeft: function(i, node) { return 4; },
+                            paddingRight: function(i, node) { return 4; }
+                        }
+                    });
+
+                    // Add spacing after the header
+                    doc.content.splice(1, 0, {
+                        text: '',
+                        margin: [0, 10, 0, 0]
+                    });
+
+                    // Reduce font size for the main data table
+                    doc.defaultStyle.fontSize = 8;
+                    doc.styles.tableHeader.fontSize = 9;
+                    doc.styles.tableHeader.alignment = 'left';
+
+                    // Add borders to main table
+                    var objLayout = {};
+                    objLayout['hLineWidth'] = function(i) { return 0.5; };
+                    objLayout['vLineWidth'] = function(i) { return 0.5; };
+                    objLayout['hLineColor'] = function(i) { return '#aaa'; };
+                    objLayout['vLineColor'] = function(i) { return '#aaa'; };
+                    objLayout['paddingLeft'] = function(i) { return 4; };
+                    objLayout['paddingRight'] = function(i) { return 4; };
+                    
+                    if (doc.content[2] && doc.content[2].table) {
+                        doc.content[2].layout = objLayout;
+                    }
+                }
+            },
+            {
+                extend: 'print',
+                title: '',
+                exportOptions: {
+                    columns: ':visible'
+                },
+                customize: function (win) {
+                    // Add custom header for print
+                    $(win.document.body).prepend(
+                        '<div style="margin-bottom: 20px; border: 1px solid #ddd; padding: 10px;">' +
+                        '<table style="width: 100%; border-collapse: collapse;">' +
+                        '<tr><td style="border: 1px solid #ddd; padding: 5px; font-weight: bold; width: 120px;">Customer Name:</td>' +
+                        '<td style="border: 1px solid #ddd; padding: 5px;" colspan="3">Tamil Nadu State Marketing Corporation</td></tr>' +
+                        '<tr><td style="border: 1px solid #ddd; padding: 5px; font-weight: bold;" colspan="4">Event Timestamp</td></tr>' +
+                        '<tr><td style="border: 1px solid #ddd; padding: 5px;"></td>' +
+                        '<td style="border: 1px solid #ddd; padding: 5px; font-weight: bold; text-align: center;">from</td>' +
+                        '<td style="border: 1px solid #ddd; padding: 5px; font-weight: bold; text-align: center;">to</td>' +
+                        '<td style="border: 1px solid #ddd; padding: 5px;"></td></tr>' +
+                        '<tr><td style="border: 1px solid #ddd; padding: 5px; font-weight: bold;">Date</td>' +
+                        '<td style="border: 1px solid #ddd; padding: 5px; text-align: center;">' + "${fdate}" + '</td>' +
+                        '<td style="border: 1px solid #ddd; padding: 5px; text-align: center;">' + "${tdate}" + '</td>' +
+                        '<td style="border: 1px solid #ddd; padding: 5px;"></td></tr>' +
+                        '<tr><td style="border: 1px solid #ddd; padding: 5px; font-weight: bold;">No. of Days</td>' +
+                        '<td style="border: 1px solid #ddd; padding: 5px; text-align: center;">' + calculateDays("${fdate}", "${tdate}") + '</td>' +
+                        '<td style="border: 1px solid #ddd; padding: 5px;" colspan="2"></td></tr>' +
+                        '</table>' +
+                        '</div>'
+                    );
+                }
+            },
+            "colvis"
+        ]
+    }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+});
+
+// Helper function to calculate days between two dates
+function calculateDays(fromDate, toDate) {
+    try {
+        var from = new Date(fromDate);
+        var to = new Date(toDate);
+        var timeDiff = Math.abs(to.getTime() - from.getTime());
+        var daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+        return daysDiff + 1; // Including both start and end dates
+    } catch (e) {
+        return 'N/A';
+    }
+}
+
+// Helper function to get Excel column name from index
+function getExcelColumn(columnIndex) {
+    var column = '';
+    while (columnIndex > 0) {
+        var remainder = (columnIndex - 1) % 26;
+        column = String.fromCharCode(65 + remainder) + column;
+        columnIndex = Math.floor((columnIndex - 1) / 26);
+    }
+    return column;
+}
 </script>
 
 </body>

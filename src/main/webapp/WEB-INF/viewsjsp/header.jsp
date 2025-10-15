@@ -116,15 +116,15 @@ scratch. This page gets rid of all links and provides the needed markup only.
 									class="dropdown-item">Manual Topology List</a></li>
 								<%
 								}
-								if (dashboardScope.contains("Top_Talker")) {
+								/* if (dashboardScope.contains("Top_Talker")) { */
 								%>
-								<li class="dropdown-divider"></li>
+								<%-- <li class="dropdown-divider"></li>
 
 								<li><a
 									href="<%=request.getContextPath()%>/dashboard/toptalker"
-									class="dropdown-item">Top Talker</a></li>
+									class="dropdown-item">Top Talker</a></li> --%>
 								<%
-								}
+								/* } */
 
 								if (dashboardScope.contains("Port_Summary")) {
 								%>

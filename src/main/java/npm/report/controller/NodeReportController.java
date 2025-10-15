@@ -162,7 +162,7 @@ public class NodeReportController {
 
 		// m.addAttribute("fetching", new UserMasterBean());
 		ModelAndView m = new ModelAndView();
-		m.addObject("groupName", dao.getGroupMap());
+		m.addObject("groupName", dao.getLocationMap());
 		m.setViewName("NodeAvailability");
 		return m;
 	}
@@ -239,7 +239,8 @@ public class NodeReportController {
 		PrintWriter out = null;
 		try {
 			out = res.getWriter();
-			out.print(NodeRdao.getGroupDeviceDetails(group_name, userScopeData));
+//			out.print(NodeRdao.getGroupDeviceDetails(group_name, userScopeData));
+			out.print(NodeRdao.getLocationDeviceDetails(group_name, userScopeData));
 		} catch (Exception e54) {
 			e54.printStackTrace();
 		} finally {
