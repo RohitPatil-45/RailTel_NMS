@@ -1506,10 +1506,21 @@ public class NodeReportController {
 	}
 
 	// SLA Report as per working hours
-	@RequestMapping("/sla")
-	public String sla() {
+//	@RequestMapping("/sla")
+//	public String sla() {
+//
+//		return "workingHoursSLAReport";
+//	}
 
-		return "workingHoursSLAReport";
+	@RequestMapping("/sla")
+	public ModelAndView sla(HttpServletRequest req, HttpServletResponse res) {
+		System.out.println("Controller Called SLA");
+
+		// m.addAttribute("fetching", new UserMasterBean());
+		ModelAndView m = new ModelAndView();
+		m.addObject("groupName", dao.getLocationMap());
+		m.setViewName("workingHoursSLAReport");
+		return m;
 	}
 
 	@RequestMapping("/slaReportData")
@@ -1517,8 +1528,10 @@ public class NodeReportController {
 		ModelAndView m = new ModelAndView();
 		String from_date = req.getParameter("from_date");
 		String to_date = req.getParameter("to_date");
+		String location = req.getParameter("group_name");
+		System.out.println("location ::"+location);
 		String yearlyCost = req.getParameter("yearlyCost");
-		m.addObject("slaReportData", service.slaReportData(from_date, to_date, yearlyCost));
+		m.addObject("slaReportData", service.slaReportData(from_date, to_date, yearlyCost,location));
 		m.addObject("fdate", from_date);
 		m.addObject("tdate", to_date);
 		m.setViewName("workingHoursSLAReportData");

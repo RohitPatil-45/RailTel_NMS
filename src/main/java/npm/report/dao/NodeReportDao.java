@@ -168,7 +168,7 @@ public interface NodeReportDao {
 
 	JSONArray getWorkingHoursAvailabilityReport(String from_date, String to_date);
 
-	JSONArray slaReportData(String from_date, String to_date, String yearlyCost);
+	JSONArray slaReportData(String from_date, String to_date, String yearlyCost,String location);
 
 	JSONArray LinkLatencystatusreport(String from_date, String to_date, List<String> list);
 

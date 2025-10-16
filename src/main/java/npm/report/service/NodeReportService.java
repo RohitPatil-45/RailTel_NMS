@@ -155,7 +155,7 @@ public interface NodeReportService {
 
 	JSONArray getWorkingHoursAvailabilityReport(String from_date, String to_date);
 
-	JSONArray slaReportData(String from_date, String to_date, String yearlyCost);
+	JSONArray slaReportData(String from_date, String to_date, String yearlyCost,String location);
 
 	JSONArray avgLatencyStatusHistoryReport(String from_date, String to_date, String status);
 

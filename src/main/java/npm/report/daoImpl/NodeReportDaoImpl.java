@@ -2969,229 +2969,436 @@ public class NodeReportDaoImpl extends AbstractDao<Integer, AddNodeModel> implem
 		return arrayList;
 	}
 
-	public JSONArray slaReportData(String from_date, String to_date, String yearlyCost) {
-		JSONArray array = null;
-		JSONArray arrayList = new JSONArray();
-		int penalty_cost_percentage = 0;
-		double penalty_cost = 0;
-		int sr = 0;
-		String daysData = "";
-		String fromTime = "";
-		String toTime = "";
-		String numericDaysData = "";
-		String betweenData = "";
-
-		System.out.println(yearlyCost);
-		System.out.println(from_date);
-		System.out.println(to_date);
-
-		System.out.println(fromTime);
-		System.out.println(toTime);
-
-		System.out.println(numericDaysData);
-		System.out.println(betweenData);
-
-		Map<String, Map<String, String>> deviceMap = null;
-
-		try {
-
-			String query001 = "SELECT device_ip, device_name, group_name,LOCATION FROM add_node ";
-
-			System.out.println("Query: " + query001);
-
-			// Execute the query.
-			Query q001 = getSession().createSQLQuery(query001);
-
-			// Fetch the results as a list of Object arrays.
-			List<Object[]> results = q001.list();
-
-			// Create a HashMap to store the results.
-			deviceMap = new HashMap<String, Map<String, String>>();
-
-			// Iterate through the results and populate the HashMap.
-			for (Object[] row : results) {
-				String deviceIp = (String) row[0];
-				String deviceName = (String) row[1];
-				String groupName = (String) row[2];
-				String LOCATION = (String) row[3];
-
-				Map<String, String> innerMap = new HashMap<String, String>();
-				innerMap.put("deviceName", deviceName); // Key as deviceName and value as deviceName
-				innerMap.put("groupName", groupName);
-				innerMap.put("LOCATION", LOCATION);
-				deviceMap.put(deviceIp, innerMap);
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		try {
-			String query = " SELECT \r\n" + "    device_ip,\r\n"
-					+ "     SUM(CASE WHEN status = 'Up' THEN total_duration_seconds ELSE 0 END) AS uptime_hours,\r\n"
-					+ "     SUM(CASE WHEN status = 'Down' THEN total_duration_seconds ELSE 0 END) AS downtime_hours\r\n"
-					+ "FROM (\r\n" + "    SELECT \r\n" + "        device_ip,\r\n" + "        status,\r\n"
-					+ " COALESCE(\r\n" + "            LEAD(timestamp_epoch) OVER (\r\n"
-					+ "                PARTITION BY device_ip, DATE(FROM_UNIXTIME(timestamp_epoch)) \r\n"
-					+ "                ORDER BY timestamp_epoch\r\n" + "            ) - timestamp_epoch, \r\n"
-					+ "            0\r\n" + "        ) AS total_duration_seconds "
-					+ "    FROM device_status_latency_history\r\n"
-					+ "    WHERE working_hour_flag=1 AND timestamp BETWEEN '" + from_date + "' AND '" + to_date
-					+ "' \r\n" + ") AS durations\r\n " + "GROUP BY device_ip";
-
-//			String query = "SELECT \r\n" + "    device_ip,\r\n"
-//					+ "    SUM(CASE WHEN status = 'Up' AND working_hour_flag = 1 THEN total_duration_seconds ELSE 0 END) AS uptime_seconds,\r\n"
-//					+ "    SUM(CASE WHEN status = 'Down' AND working_hour_flag = 1 THEN total_duration_seconds ELSE 0 END) AS downtime_seconds\r\n"
+//	public JSONArray slaReportData(String from_date, String to_date, String yearlyCost,String location) {
+//		JSONArray array = null;
+//		JSONArray arrayList = new JSONArray();
+//		int penalty_cost_percentage = 0;
+//		double penalty_cost = 0;
+//		int sr = 0;
+//		String daysData = "";
+//		String fromTime = "";
+//		String toTime = "";
+//		String numericDaysData = "";
+//		String betweenData = "";
+//
+//		System.out.println(yearlyCost);
+//		System.out.println(from_date);
+//		System.out.println(to_date);
+//
+//		System.out.println(fromTime);
+//		System.out.println(toTime);
+//
+//		System.out.println(numericDaysData);
+//		System.out.println(betweenData);
+//
+//		Map<String, Map<String, String>> deviceMap = null;
+//
+//		try {
+//
+//			String query001 = "SELECT device_ip, device_name, group_name,LOCATION FROM add_node ";
+//
+//			System.out.println("Query: " + query001);
+//
+//			// Execute the query.
+//			Query q001 = getSession().createSQLQuery(query001);
+//
+//			// Fetch the results as a list of Object arrays.
+//			List<Object[]> results = q001.list();
+//
+//			// Create a HashMap to store the results.
+//			deviceMap = new HashMap<String, Map<String, String>>();
+//
+//			// Iterate through the results and populate the HashMap.
+//			for (Object[] row : results) {
+//				String deviceIp = (String) row[0];
+//				String deviceName = (String) row[1];
+//				String groupName = (String) row[2];
+//				String LOCATION = (String) row[3];
+//
+//				Map<String, String> innerMap = new HashMap<String, String>();
+//				innerMap.put("deviceName", deviceName); // Key as deviceName and value as deviceName
+//				innerMap.put("groupName", groupName);
+//				innerMap.put("LOCATION", LOCATION);
+//				deviceMap.put(deviceIp, innerMap);
+//			}
+//
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//
+//		try {
+//			String query = " SELECT \r\n" + "    device_ip,\r\n"
+//					+ "     SUM(CASE WHEN status = 'Up' THEN total_duration_seconds ELSE 0 END) AS uptime_hours,\r\n"
+//					+ "     SUM(CASE WHEN status = 'Down' THEN total_duration_seconds ELSE 0 END) AS downtime_hours\r\n"
 //					+ "FROM (\r\n" + "    SELECT \r\n" + "        device_ip,\r\n" + "        status,\r\n"
-//					+ "        working_hour_flag,\r\n" + "        COALESCE(\r\n"
-//					+ "            LEAD(timestamp_epoch) OVER (PARTITION BY device_ip ORDER BY timestamp_epoch) - timestamp_epoch, \r\n"
-//					+ "            0\r\n" + "        ) AS total_duration_seconds\r\n"
+//					+ " COALESCE(\r\n" + "            LEAD(timestamp_epoch) OVER (\r\n"
+//					+ "                PARTITION BY device_ip, DATE(FROM_UNIXTIME(timestamp_epoch)) \r\n"
+//					+ "                ORDER BY timestamp_epoch\r\n" + "            ) - timestamp_epoch, \r\n"
+//					+ "            0\r\n" + "        ) AS total_duration_seconds "
 //					+ "    FROM device_status_latency_history\r\n"
 //					+ "    WHERE working_hour_flag=1 AND timestamp BETWEEN '" + from_date + "' AND '" + to_date
-//					+ "' \r\n" + ") AS durations\r\n" + "GROUP BY device_ip";
-
-//			List<Object[]> li = getSession().createSQLQuery(
-//					"select NODE_IP, avg(UPTIME_PERCENT), avg(DOWNTIME_PERCENT) from node_availability group by NODE_IP")
-//					.list();
-			List<Object[]> li = getSession().createSQLQuery(query).list();
-			for (Object[] data : li) {
-				array = new JSONArray();
-				sr++;
-				String ip = data[0].toString().trim();
-				Map<String, String> deviceDetails = deviceMap.get(ip);
-				String deviceName = "-";
-				String groupName = "-";
-				String LOCATION = "-";
-
-				if (deviceDetails != null) {
-					deviceName = deviceDetails.get("deviceName");
-					groupName = deviceDetails.get("groupName");
-					LOCATION = deviceDetails.get("LOCATION");
-
-//		            // Print or process the retrieved details.
-//		            System.out.println("IP: " + ip + ", Device Name: " + deviceName + ", Group Name: " + groupName);
-				}
-
-				array.put(sr);
-				String ipaddress = data[0].toString();
-				Long uptime = Long.parseLong(data[1].toString().trim());
-				Long downtime = Long.parseLong(data[2].toString().trim());
-
-//				Long uptime = null;
-//				Long downtime = null;
-
-//				if (data[1].toString().trim().matches("\\d+\\.\\d+")) { // Check if the string is a valid decimal number
-//					double value = Double.parseDouble(data[1].toString().trim());
-//					uptime = Math.round(value);
-//				} else {
-//					// Handle invalid input
-//					uptime = Long.parseLong(data[1].toString().trim());
+//					+ "' \r\n" + ") AS durations\r\n " + "GROUP BY device_ip";
 //
+////			String query = "SELECT \r\n" + "    device_ip,\r\n"
+////					+ "    SUM(CASE WHEN status = 'Up' AND working_hour_flag = 1 THEN total_duration_seconds ELSE 0 END) AS uptime_seconds,\r\n"
+////					+ "    SUM(CASE WHEN status = 'Down' AND working_hour_flag = 1 THEN total_duration_seconds ELSE 0 END) AS downtime_seconds\r\n"
+////					+ "FROM (\r\n" + "    SELECT \r\n" + "        device_ip,\r\n" + "        status,\r\n"
+////					+ "        working_hour_flag,\r\n" + "        COALESCE(\r\n"
+////					+ "            LEAD(timestamp_epoch) OVER (PARTITION BY device_ip ORDER BY timestamp_epoch) - timestamp_epoch, \r\n"
+////					+ "            0\r\n" + "        ) AS total_duration_seconds\r\n"
+////					+ "    FROM device_status_latency_history\r\n"
+////					+ "    WHERE working_hour_flag=1 AND timestamp BETWEEN '" + from_date + "' AND '" + to_date
+////					+ "' \r\n" + ") AS durations\r\n" + "GROUP BY device_ip";
+//
+////			List<Object[]> li = getSession().createSQLQuery(
+////					"select NODE_IP, avg(UPTIME_PERCENT), avg(DOWNTIME_PERCENT) from node_availability group by NODE_IP")
+////					.list();
+//			List<Object[]> li = getSession().createSQLQuery(query).list();
+//			for (Object[] data : li) {
+//				array = new JSONArray();
+//				sr++;
+//				String ip = data[0].toString().trim();
+//				Map<String, String> deviceDetails = deviceMap.get(ip);
+//				String deviceName = "-";
+//				String groupName = "-";
+//				String LOCATION = "-";
+//
+//				if (deviceDetails != null) {
+//					deviceName = deviceDetails.get("deviceName");
+//					groupName = deviceDetails.get("groupName");
+//					LOCATION = deviceDetails.get("LOCATION");
+//
+////		            // Print or process the retrieved details.
+////		            System.out.println("IP: " + ip + ", Device Name: " + deviceName + ", Group Name: " + groupName);
 //				}
-//				if (data[2].toString().trim().matches("\\d+\\.\\d+")) { // Check if the string is a valid decimal number
-//					double value = Double.parseDouble(data[2].toString().trim());
-//					downtime = Math.round(value);
-//				} else {
-//					// Handle invalid input
 //
-//					downtime = Long.parseLong(data[2].toString().trim());
-//				}
-
-				Long totalTime = uptime + downtime;
-
-				// Calculate Uptime (%) and Downtime (%)
-				double uptimePercentage = (uptime * 100.0) / totalTime;
-				double downtimePercentage = (downtime * 100.0) / totalTime;
-
-//				struig cal
-
-				int day = (int) TimeUnit.SECONDS.toDays(uptime);
-				long hours = TimeUnit.SECONDS.toHours(uptime) - (day * 24);
-				long minute = TimeUnit.SECONDS.toMinutes(uptime) - (TimeUnit.SECONDS.toHours(uptime) * 60);
-				long second = TimeUnit.SECONDS.toSeconds(uptime) - (TimeUnit.SECONDS.toMinutes(uptime) * 60);
-				String var_uptime = day + " Days, " + hours + " Hours, " + minute + " Minutes, " + second + " Seconds";
-
-//				int day = (int) TimeUnit.HOURS.toDays((long) uptime); // Convert hours to days
-//				long hours = (long) uptime % 24; // Remaining whole hours after extracting days
+//				array.put(sr);
+//				String ipaddress = data[0].toString();
+//				Long uptime = Long.parseLong(data[1].toString().trim());
+//				Long downtime = Long.parseLong(data[2].toString().trim());
 //
-//				// Extract the fractional part of the hour and convert to minutes and seconds
-//				double fractionalHour = uptime - (long) uptime; // Fractional part (e.g., 0.77)
-//				long minute = (long) (fractionalHour * 60); // Convert fraction to minutes
-//				long second = (long) ((fractionalHour * 60 - minute) * 60); // Remaining fraction to seconds
-
+////				Long uptime = null;
+////				Long downtime = null;
+//
+////				if (data[1].toString().trim().matches("\\d+\\.\\d+")) { // Check if the string is a valid decimal number
+////					double value = Double.parseDouble(data[1].toString().trim());
+////					uptime = Math.round(value);
+////				} else {
+////					// Handle invalid input
+////					uptime = Long.parseLong(data[1].toString().trim());
+////
+////				}
+////				if (data[2].toString().trim().matches("\\d+\\.\\d+")) { // Check if the string is a valid decimal number
+////					double value = Double.parseDouble(data[2].toString().trim());
+////					downtime = Math.round(value);
+////				} else {
+////					// Handle invalid input
+////
+////					downtime = Long.parseLong(data[2].toString().trim());
+////				}
+//
+//				Long totalTime = uptime + downtime;
+//
+//				// Calculate Uptime (%) and Downtime (%)
+//				double uptimePercentage = (uptime * 100.0) / totalTime;
+//				double downtimePercentage = (downtime * 100.0) / totalTime;
+//
+////				struig cal
+//
+//				int day = (int) TimeUnit.SECONDS.toDays(uptime);
+//				long hours = TimeUnit.SECONDS.toHours(uptime) - (day * 24);
+//				long minute = TimeUnit.SECONDS.toMinutes(uptime) - (TimeUnit.SECONDS.toHours(uptime) * 60);
+//				long second = TimeUnit.SECONDS.toSeconds(uptime) - (TimeUnit.SECONDS.toMinutes(uptime) * 60);
 //				String var_uptime = day + " Days, " + hours + " Hours, " + minute + " Minutes, " + second + " Seconds";
-
-				day = (int) TimeUnit.SECONDS.toDays(downtime);
-				hours = TimeUnit.SECONDS.toHours(downtime) - (day * 24);
-				minute = TimeUnit.SECONDS.toMinutes(downtime) - (TimeUnit.SECONDS.toHours(downtime) * 60);
-				second = TimeUnit.SECONDS.toSeconds(downtime) - (TimeUnit.SECONDS.toMinutes(downtime) * 60);
-				String var_Downtime = day + " Days, " + hours + " Hours, " + minute + " Minutes, " + second
-						+ " Seconds";
-
-//				day = (int) TimeUnit.HOURS.toDays((long) downtime); // Convert hours to days
-//				hours = (long) downtime % 24; // Remaining whole hours after extracting days
 //
-//				// Extract the fractional part of the hour and convert to minutes and seconds
-//				fractionalHour = downtime - (long) downtime; // Fractional part (e.g., 0.77)
-//				minute = (long) (fractionalHour * 60); // Convert fraction to minutes
-//				second = (long) ((fractionalHour * 60 - minute) * 60); // Remaining fraction to seconds
+////				int day = (int) TimeUnit.HOURS.toDays((long) uptime); // Convert hours to days
+////				long hours = (long) uptime % 24; // Remaining whole hours after extracting days
+////
+////				// Extract the fractional part of the hour and convert to minutes and seconds
+////				double fractionalHour = uptime - (long) uptime; // Fractional part (e.g., 0.77)
+////				long minute = (long) (fractionalHour * 60); // Convert fraction to minutes
+////				long second = (long) ((fractionalHour * 60 - minute) * 60); // Remaining fraction to seconds
 //
+////				String var_uptime = day + " Days, " + hours + " Hours, " + minute + " Minutes, " + second + " Seconds";
+//
+//				day = (int) TimeUnit.SECONDS.toDays(downtime);
+//				hours = TimeUnit.SECONDS.toHours(downtime) - (day * 24);
+//				minute = TimeUnit.SECONDS.toMinutes(downtime) - (TimeUnit.SECONDS.toHours(downtime) * 60);
+//				second = TimeUnit.SECONDS.toSeconds(downtime) - (TimeUnit.SECONDS.toMinutes(downtime) * 60);
 //				String var_Downtime = day + " Days, " + hours + " Hours, " + minute + " Minutes, " + second
 //						+ " Seconds";
+//
+////				day = (int) TimeUnit.HOURS.toDays((long) downtime); // Convert hours to days
+////				hours = (long) downtime % 24; // Remaining whole hours after extracting days
+////
+////				// Extract the fractional part of the hour and convert to minutes and seconds
+////				fractionalHour = downtime - (long) downtime; // Fractional part (e.g., 0.77)
+////				minute = (long) (fractionalHour * 60); // Convert fraction to minutes
+////				second = (long) ((fractionalHour * 60 - minute) * 60); // Remaining fraction to seconds
+////
+////				String var_Downtime = day + " Days, " + hours + " Hours, " + minute + " Minutes, " + second
+////						+ " Seconds";
+//
+//				double UptimeTotalhours = (double) uptime;
+//				double DowntimeTotalhours = (double) downtime;
+//
+//				String formattedUptimehours = String.format("%.2f", UptimeTotalhours);
+//				String formattedDowntimehours = String.format("%.2f", DowntimeTotalhours);
+//				// Parse the formatted strings back to doubles for calculation
+//				double formattedUptime22 = Double.parseDouble(formattedUptimehours);
+//				double formattedDowntime22 = Double.parseDouble(formattedDowntimehours);
+//
+//				// Calculate the total
+//				double totalHours = formattedUptime22 + formattedDowntime22;
+//
+//				DecimalFormat df = new DecimalFormat("0.00");
+//				array.put(data[0]);
+//				array.put(deviceName);
+//				array.put(groupName);
+//				array.put(LOCATION);
+//				array.put(var_uptime);
+//				array.put(var_Downtime);
+//				array.put(formattedUptimehours);
+//				array.put(formattedDowntimehours);
+//				array.put(String.format("%.2f", totalHours));
+//				array.put(df.format(uptimePercentage));
+//				array.put(df.format(downtimePercentage));
+//
+//				if (uptimePercentage >= 99) {
+//					penalty_cost_percentage = 0;
+//				} else if (uptimePercentage >= 98.5 && uptimePercentage < 99) {
+//					penalty_cost_percentage = 10;
+//				} else if (uptimePercentage >= 97.5 && uptimePercentage < 98.5) {
+//					penalty_cost_percentage = 20;
+//				} else if (uptimePercentage >= 96.5 && uptimePercentage < 97.5) {
+//					penalty_cost_percentage = 25;
+//				} else if (uptimePercentage < 96.5) {
+//					penalty_cost_percentage = 30;
+//				} else if (uptimePercentage < 96.5) {
+//					penalty_cost_percentage = -1;
+//				}
+//
+//				penalty_cost = (Double.valueOf(yearlyCost) * penalty_cost_percentage) / 100;
+//				array.put(Double.valueOf(yearlyCost));
+//				array.put(penalty_cost_percentage);
+//				array.put(penalty_cost);
+//				array.put(Double.valueOf(yearlyCost) - penalty_cost);
+//
+//				arrayList.put(array);
+//			}
+//
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//		System.out.println(arrayList);
+//		return arrayList;
+//	}
+	
+	public JSONArray slaReportData(String from_date, String to_date, String yearlyCost, String location) {
+	    JSONArray arrayList = new JSONArray();
+	    int penalty_cost_percentage = 0;
+	    double penalty_cost = 0;
+	    int sr = 0;
+	    location = location.trim();
+	    System.out.println("Yearly Cost: " + yearlyCost);
+	    System.out.println("From Date: " + from_date);
+	    System.out.println("To Date: " + to_date);
+	    System.out.println("Location: " + location);
 
-				double UptimeTotalhours = (double) uptime;
-				double DowntimeTotalhours = (double) downtime;
+	    Map<String, Map<String, String>> deviceMap = new HashMap<>();
 
-				String formattedUptimehours = String.format("%.2f", UptimeTotalhours);
-				String formattedDowntimehours = String.format("%.2f", DowntimeTotalhours);
-				// Parse the formatted strings back to doubles for calculation
-				double formattedUptime22 = Double.parseDouble(formattedUptimehours);
-				double formattedDowntime22 = Double.parseDouble(formattedDowntimehours);
+	    try {
+	        // Build device query based on location
+	        String deviceQuery;
+	        Query deviceQ;
+	        
+	        if (location.equalsIgnoreCase("All")) {
+	            deviceQuery = "SELECT device_ip, device_name, group_name, LOCATION FROM add_node";
+	            deviceQ = getSession().createSQLQuery(deviceQuery);
+	        } else {
+	            deviceQuery = "SELECT device_ip, device_name, group_name, LOCATION FROM add_node WHERE LOCATION = :location";
+	            deviceQ = getSession().createSQLQuery(deviceQuery);
+	            deviceQ.setParameter("location", location);
+	        }
 
-				// Calculate the total
-				double totalHours = formattedUptime22 + formattedDowntime22;
+	        System.out.println("Device Query: " + deviceQuery);
 
-				DecimalFormat df = new DecimalFormat("0.00");
-				array.put(data[0]);
-				array.put(deviceName);
-				array.put(groupName);
-				array.put(LOCATION);
-				array.put(var_uptime);
-				array.put(var_Downtime);
-				array.put(formattedUptimehours);
-				array.put(formattedDowntimehours);
-				array.put(String.format("%.2f", totalHours));
-				array.put(df.format(uptimePercentage));
-				array.put(df.format(downtimePercentage));
+	        // Fetch the device results
+	        List<Object[]> deviceResults = deviceQ.list();
 
-				if (uptimePercentage >= 99) {
-					penalty_cost_percentage = 0;
-				} else if (uptimePercentage >= 98.5 && uptimePercentage < 99) {
-					penalty_cost_percentage = 10;
-				} else if (uptimePercentage >= 97.5 && uptimePercentage < 98.5) {
-					penalty_cost_percentage = 20;
-				} else if (uptimePercentage >= 96.5 && uptimePercentage < 97.5) {
-					penalty_cost_percentage = 25;
-				} else if (uptimePercentage < 96.5) {
-					penalty_cost_percentage = 30;
-				} else if (uptimePercentage < 96.5) {
-					penalty_cost_percentage = -1;
-				}
+	        // Create device map and collect IPs
+	        List<String> deviceIps = new ArrayList<>();
+	        for (Object[] row : deviceResults) {
+	            String deviceIp = (String) row[0];
+	            String deviceName = (String) row[1];
+	            String groupName = (String) row[2];
+	            String deviceLocation = (String) row[3];
 
-				penalty_cost = (Double.valueOf(yearlyCost) * penalty_cost_percentage) / 100;
-				array.put(Double.valueOf(yearlyCost));
-				array.put(penalty_cost_percentage);
-				array.put(penalty_cost);
-				array.put(Double.valueOf(yearlyCost) - penalty_cost);
+	            Map<String, String> innerMap = new HashMap<>();
+	            innerMap.put("deviceName", deviceName);
+	            innerMap.put("groupName", groupName);
+	            innerMap.put("LOCATION", deviceLocation);
+	            deviceMap.put(deviceIp, innerMap);
+	            deviceIps.add(deviceIp);
+	        }
 
-				arrayList.put(array);
-			}
+	        // If no devices found, return empty array
+	        if (deviceIps.isEmpty()) {
+	            System.out.println("No devices found for location: " + location);
+	            return arrayList;
+	        }
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		System.out.println(arrayList);
-		return arrayList;
+	        // Build main query with device IP filter
+	        String mainQuery = 
+	            "SELECT device_ip, " +
+	            "SUM(CASE WHEN status = 'Up' THEN total_duration_seconds ELSE 0 END) AS uptime_seconds, " +
+	            "SUM(CASE WHEN status = 'Down' THEN total_duration_seconds ELSE 0 END) AS downtime_seconds " +
+	            "FROM ( " +
+	            "    SELECT device_ip, status, " +
+	            "    COALESCE( " +
+	            "        LEAD(timestamp_epoch) OVER ( " +
+	            "            PARTITION BY device_ip, DATE(FROM_UNIXTIME(timestamp_epoch)) " +
+	            "            ORDER BY timestamp_epoch " +
+	            "        ) - timestamp_epoch, 0 " +
+	            "    ) AS total_duration_seconds " +
+	            "    FROM device_status_latency_history " +
+	            "    WHERE working_hour_flag = 1 AND timestamp BETWEEN :fromDate AND :toDate " +
+	            "    AND device_ip IN (:deviceIps) " +  // Filter by devices from add_node table
+	            ") AS durations " +
+	            "GROUP BY device_ip";
+
+	        System.out.println("Main Query: " + mainQuery);
+
+	        // Execute main query with parameters
+	        Query mainQ = getSession().createSQLQuery(mainQuery);
+	        mainQ.setParameter("fromDate", from_date);
+	        mainQ.setParameter("toDate", to_date);
+	        mainQ.setParameterList("deviceIps", deviceIps);  // Set the list of device IPs
+
+	        List<Object[]> mainResults = mainQ.list();
+	        System.out.println("Found " + mainResults.size() + " devices with status data");
+
+	        // Process results
+	        for (Object[] data : mainResults) {
+	            JSONArray array = new JSONArray();
+	            sr++;
+	            
+	            String ip = data[0].toString().trim();
+	            Map<String, String> deviceDetails = deviceMap.get(ip);
+	            
+	            String deviceName = "-";
+	            String groupName = "-";
+	            String deviceLocation = "-";
+
+	            if (deviceDetails != null) {
+	                deviceName = deviceDetails.get("deviceName");
+	                groupName = deviceDetails.get("groupName");
+	                deviceLocation = deviceDetails.get("LOCATION");
+	            } else {
+	                System.out.println("No device details found for IP: " + ip);
+	                continue; // Skip if no device details found
+	            }
+
+	            // Get uptime and downtime values
+	            Long uptime = 0L;
+	            Long downtime = 0L;
+	            
+	            try {
+	                uptime = data[1] != null ? Long.parseLong(data[1].toString().trim()) : 0L;
+	                downtime = data[2] != null ? Long.parseLong(data[2].toString().trim()) : 0L;
+	            } catch (NumberFormatException e) {
+	                System.out.println("Error parsing uptime/downtime for IP: " + ip);
+	                e.printStackTrace();
+	                continue;
+	            }
+
+	            Long totalTime = uptime + downtime;
+
+	            // Avoid division by zero
+	            if (totalTime == 0) {
+	                System.out.println("Total time is zero for IP: " + ip);
+	                continue;
+	            }
+
+	            // Calculate percentages
+	            double uptimePercentage = (uptime * 100.0) / totalTime;
+	            double downtimePercentage = (downtime * 100.0) / totalTime;
+
+	            // Format time durations
+	            String formattedUptime = formatDuration(uptime);
+	            String formattedDowntime = formatDuration(downtime);
+
+	            // Format hours
+	            double uptimeHours = uptime / 3600.0; // Convert seconds to hours
+	            double downtimeHours = downtime / 3600.0; // Convert seconds to hours
+	            double totalHours = uptimeHours + downtimeHours;
+
+	            String formattedUptimeHours = String.format("%.2f", uptimeHours);
+	            String formattedDowntimeHours = String.format("%.2f", downtimeHours);
+
+	            // Calculate penalty
+	            penalty_cost_percentage = calculatePenaltyPercentage(uptimePercentage);
+	            double yearlyCostValue = Double.parseDouble(yearlyCost);
+	            penalty_cost = (yearlyCostValue * penalty_cost_percentage) / 100;
+
+	            // Build the array
+	            DecimalFormat df = new DecimalFormat("0.00");
+	            array.put(sr);
+	            array.put(ip); // IP address
+	            array.put(deviceName);
+	            array.put(groupName);
+	            array.put(deviceLocation);
+	            array.put(formattedUptime);
+	            array.put(formattedDowntime);
+	            array.put(formattedUptimeHours);
+	            array.put(formattedDowntimeHours);
+	            array.put(String.format("%.2f", totalHours));
+	            array.put(df.format(uptimePercentage));
+	            array.put(df.format(downtimePercentage));
+	            array.put(yearlyCostValue);
+	            array.put(penalty_cost_percentage);
+	            array.put(penalty_cost);
+	            array.put(yearlyCostValue - penalty_cost);
+
+	            arrayList.put(array);
+	        }
+
+	    } catch (Exception e) {
+	        System.out.println("Error in slaReportData: " + e.getMessage());
+	        e.printStackTrace();
+	    }
+	    
+	    System.out.println("Final Array Size: " + arrayList.length());
+	    return arrayList;
+	}
+
+	// Helper method to format duration
+	private String formatDuration(long seconds) {
+	    if (seconds == 0) {
+	        return "0 Days, 0 Hours, 0 Minutes, 0 Seconds";
+	    }
+	    
+	    int day = (int) TimeUnit.SECONDS.toDays(seconds);
+	    long hours = TimeUnit.SECONDS.toHours(seconds) - (day * 24);
+	    long minute = TimeUnit.SECONDS.toMinutes(seconds) - (TimeUnit.SECONDS.toHours(seconds) * 60);
+	    long second = TimeUnit.SECONDS.toSeconds(seconds) - (TimeUnit.SECONDS.toMinutes(seconds) * 60);
+	    
+	    return day + " Days, " + hours + " Hours, " + minute + " Minutes, " + second + " Seconds";
+	}
+
+	// Helper method to calculate penalty percentage
+	private int calculatePenaltyPercentage(double uptimePercentage) {
+	    if (uptimePercentage >= 99) {
+	        return 0;
+	    } else if (uptimePercentage >= 98.5) {
+	        return 10;
+	    } else if (uptimePercentage >= 97.5) {
+	        return 20;
+	    } else if (uptimePercentage >= 96.5) {
+	        return 25;
+	    } else {
+	        return 30;
+	    }
 	}
 
 	public JSONArray LinkLatencystatusreport(String from_date, String to_date, List<String> ip_list) {

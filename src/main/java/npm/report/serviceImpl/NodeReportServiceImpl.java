@@ -347,9 +347,9 @@ public class NodeReportServiceImpl implements NodeReportService {
 		return dao.getWorkingHoursAvailabilityReport(from_date, to_date);
 	}
 
-	public JSONArray slaReportData(String from_date, String to_date, String yearlyCost) {
+	public JSONArray slaReportData(String from_date, String to_date, String yearlyCost,String location) {
 		// TODO Auto-generated method stub
-		return dao.slaReportData(from_date, to_date, yearlyCost);
+		return dao.slaReportData(from_date, to_date, yearlyCost,location);
 	}
 
 	public JSONArray avgLatencyStatusHistoryReport(String from_date, String to_date, String status) {

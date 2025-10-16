@@ -3182,7 +3182,7 @@ public class MasterDaoImpl extends AbstractDao<Integer, UserMasterModel> impleme
 
 			for (LocationMasterModel group : listdata) {
 				groupMap.put("Please Select", "Please Select");
-				groupMap.put("All", "Location");
+				groupMap.put("All", "Locations");
 				groupMap.put(group.getLOCATION_NAME(), group.getLOCATION_NAME());
 			}
 
