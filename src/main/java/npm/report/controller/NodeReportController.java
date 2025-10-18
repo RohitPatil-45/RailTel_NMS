@@ -1630,6 +1630,30 @@ public class NodeReportController {
 			out.close();
 		}
 	}
+	
+	@RequestMapping(value = { "/saveNodeNotes" }, method = RequestMethod.POST)
+	public void saveNodeNotes(ModelMap model, HttpServletRequest request, HttpServletResponse response,
+			HttpSession session) {
+		String userScopeData = (String) session.getAttribute("userScope");
+		PrintWriter out = null;
+		System.out.println("in saveNodeStatusNotes Controller");
+		try {
+
+			String nodeIP = request.getParameter("nodeIP");
+			String notes = request.getParameter("notes");
+			String dateTime = request.getParameter("dateTime");
+			
+			out = response.getWriter();
+//			System.out.println(service.saveNodeStatusNotes(id, notes));
+			out.print(service.saveNodeNotes(nodeIP, notes,dateTime));
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			out.close();
+		}
+	}
+	
+	
 
 	@RequestMapping(value = "/getDevicenNotesInfo", method = RequestMethod.POST)
 	public JSONArray getDevicenNotesInfo(ModelMap model, HttpServletRequest request, HttpServletResponse response,

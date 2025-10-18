@@ -84,6 +84,7 @@
 										<thead>
 											<tr>
 												<th>Device IP</th>
+												<th>Location</th>
 												<th>Total Ports</th>
 												<th>Used Ports</th>
 												<th>Unused Ports</th>
@@ -97,6 +98,7 @@
 										<tfoot>
 											<tr>
 												<th>Device IP</th>
+												<th>Location</th>
 												<th>Total Ports</th>
 												<th>Used Ports</th>
 												<th>Unused Ports</th>

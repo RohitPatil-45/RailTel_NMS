@@ -178,9 +178,10 @@
 
 								<div class="info-box-content">
 									<span class="info-box-text">Total Nodes</span> <span
-										class="info-box-number" id="totalspanid" data-toggle="modal"
-										data-target="#device-info-modal"
-										onclick="getNodeInfo('total')">0</span>
+										class="info-box-number" id="totalspanid"
+										onclick="getNodetotalInfo('total')">0</span>
+										
+										
 								</div>
 								<!-- /.info-box-content -->
 							</div>
@@ -883,6 +884,46 @@
 									<th>Location</th>
 									<th>Customer</th>
 									<th>Date & Time</th>
+								</tr>
+							</thead>
+							<tbody>
+
+							</tbody>
+						</table>
+					</div>
+				</div>
+
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- /.modal-dialog -->
+	</div>
+	<!-- /.modal -->
+	
+	
+	<div class="modal fade" id="device-info-modalTotal">
+		<!-- 	style="height: 500px;" -->
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content" style="width: fit-content;">
+				<div class="modal-header">
+					<h4 class="modal-title">Devices Info</h4>
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body" id="deviceInfoBodyTotal">
+					<div class="card-body table-responsive p-0">
+						<table class="table table-striped table-valign-middle"
+							id="deviceInfoTableTotal">
+							<thead>
+								<tr>
+									<th>Sr No.</th>
+									<th>Node IP</th>
+									<th>Node Name</th>
+									<th>Location</th>
+									<th>Customer</th>
+									
 								</tr>
 							</thead>
 							<tbody>

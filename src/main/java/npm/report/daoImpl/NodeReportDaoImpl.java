@@ -487,8 +487,7 @@ public class NodeReportDaoImpl extends AbstractDao<Integer, AddNodeModel> implem
 		System.out.println(array1);
 		return array1;
 	}
-	
-	
+
 	public JSONArray getLocationDeviceDetails(String group_name, String userScopeData) {
 		JSONArray array = null;
 		JSONArray array1 = new JSONArray();
@@ -1155,7 +1154,7 @@ public class NodeReportDaoImpl extends AbstractDao<Integer, AddNodeModel> implem
 
 	}
 
-	public JSONArray getSlaReport(String from_date, String to_date, String yearlyCost,String location) {
+	public JSONArray getSlaReport(String from_date, String to_date, String yearlyCost, String location) {
 		JSONArray array = null;
 		JSONArray arrayList = new JSONArray();
 		int penalty_cost_percentage = 0;
@@ -2910,8 +2909,6 @@ public class NodeReportDaoImpl extends AbstractDao<Integer, AddNodeModel> implem
 					deviceName = deviceDetails.get("deviceName");
 					groupName = deviceDetails.get("groupName");
 					location = deviceDetails.get("location");
-					
-					
 
 //		            // Print or process the retrieved details.
 //		            System.out.println("IP: " + ip + ", Device Name: " + deviceName + ", Group Name: " + groupName);
@@ -2954,7 +2951,7 @@ public class NodeReportDaoImpl extends AbstractDao<Integer, AddNodeModel> implem
 				array.put(deviceName);
 				array.put(groupName);
 				array.put(location);
-				
+
 				array.put(var_uptime);
 				array.put(var_Downtime);
 				array.put(df.format(uptimePercentage));
@@ -3193,212 +3190,206 @@ public class NodeReportDaoImpl extends AbstractDao<Integer, AddNodeModel> implem
 //		System.out.println(arrayList);
 //		return arrayList;
 //	}
-	
+
 	public JSONArray slaReportData(String from_date, String to_date, String yearlyCost, String location) {
-	    JSONArray arrayList = new JSONArray();
-	    int penalty_cost_percentage = 0;
-	    double penalty_cost = 0;
-	    int sr = 0;
-	    location = location.trim();
-	    System.out.println("Yearly Cost: " + yearlyCost);
-	    System.out.println("From Date: " + from_date);
-	    System.out.println("To Date: " + to_date);
-	    System.out.println("Location: " + location);
+		JSONArray arrayList = new JSONArray();
+		int penalty_cost_percentage = 0;
+		double penalty_cost = 0;
+		int sr = 0;
+		location = location.trim();
+		System.out.println("Yearly Cost: " + yearlyCost);
+		System.out.println("From Date: " + from_date);
+		System.out.println("To Date: " + to_date);
+		System.out.println("Location: " + location);
 
-	    Map<String, Map<String, String>> deviceMap = new HashMap<>();
+		Map<String, Map<String, String>> deviceMap = new HashMap<>();
 
-	    try {
-	        // Build device query based on location
-	        String deviceQuery;
-	        Query deviceQ;
-	        
-	        if (location.equalsIgnoreCase("All")) {
-	            deviceQuery = "SELECT device_ip, device_name, group_name, LOCATION FROM add_node";
-	            deviceQ = getSession().createSQLQuery(deviceQuery);
-	        } else {
-	            deviceQuery = "SELECT device_ip, device_name, group_name, LOCATION FROM add_node WHERE LOCATION = :location";
-	            deviceQ = getSession().createSQLQuery(deviceQuery);
-	            deviceQ.setParameter("location", location);
-	        }
+		try {
+			// Build device query based on location
+			String deviceQuery;
+			Query deviceQ;
 
-	        System.out.println("Device Query: " + deviceQuery);
+			if (location.equalsIgnoreCase("All")) {
+				deviceQuery = "SELECT device_ip, device_name, group_name, LOCATION FROM add_node";
+				deviceQ = getSession().createSQLQuery(deviceQuery);
+			} else {
+				deviceQuery = "SELECT device_ip, device_name, group_name, LOCATION FROM add_node WHERE LOCATION = :location";
+				deviceQ = getSession().createSQLQuery(deviceQuery);
+				deviceQ.setParameter("location", location);
+			}
 
-	        // Fetch the device results
-	        List<Object[]> deviceResults = deviceQ.list();
+			System.out.println("Device Query: " + deviceQuery);
 
-	        // Create device map and collect IPs
-	        List<String> deviceIps = new ArrayList<>();
-	        for (Object[] row : deviceResults) {
-	            String deviceIp = (String) row[0];
-	            String deviceName = (String) row[1];
-	            String groupName = (String) row[2];
-	            String deviceLocation = (String) row[3];
+			// Fetch the device results
+			List<Object[]> deviceResults = deviceQ.list();
 
-	            Map<String, String> innerMap = new HashMap<>();
-	            innerMap.put("deviceName", deviceName);
-	            innerMap.put("groupName", groupName);
-	            innerMap.put("LOCATION", deviceLocation);
-	            deviceMap.put(deviceIp, innerMap);
-	            deviceIps.add(deviceIp);
-	        }
+			// Create device map and collect IPs
+			List<String> deviceIps = new ArrayList<>();
+			for (Object[] row : deviceResults) {
+				String deviceIp = (String) row[0];
+				String deviceName = (String) row[1];
+				String groupName = (String) row[2];
+				String deviceLocation = (String) row[3];
 
-	        // If no devices found, return empty array
-	        if (deviceIps.isEmpty()) {
-	            System.out.println("No devices found for location: " + location);
-	            return arrayList;
-	        }
+				Map<String, String> innerMap = new HashMap<>();
+				innerMap.put("deviceName", deviceName);
+				innerMap.put("groupName", groupName);
+				innerMap.put("LOCATION", deviceLocation);
+				deviceMap.put(deviceIp, innerMap);
+				deviceIps.add(deviceIp);
+			}
 
-	        // Build main query with device IP filter
-	        String mainQuery = 
-	            "SELECT device_ip, " +
-	            "SUM(CASE WHEN status = 'Up' THEN total_duration_seconds ELSE 0 END) AS uptime_seconds, " +
-	            "SUM(CASE WHEN status = 'Down' THEN total_duration_seconds ELSE 0 END) AS downtime_seconds " +
-	            "FROM ( " +
-	            "    SELECT device_ip, status, " +
-	            "    COALESCE( " +
-	            "        LEAD(timestamp_epoch) OVER ( " +
-	            "            PARTITION BY device_ip, DATE(FROM_UNIXTIME(timestamp_epoch)) " +
-	            "            ORDER BY timestamp_epoch " +
-	            "        ) - timestamp_epoch, 0 " +
-	            "    ) AS total_duration_seconds " +
-	            "    FROM device_status_latency_history " +
-	            "    WHERE working_hour_flag = 1 AND timestamp BETWEEN :fromDate AND :toDate " +
-	            "    AND device_ip IN (:deviceIps) " +  // Filter by devices from add_node table
-	            ") AS durations " +
-	            "GROUP BY device_ip";
+			// If no devices found, return empty array
+			if (deviceIps.isEmpty()) {
+				System.out.println("No devices found for location: " + location);
+				return arrayList;
+			}
 
-	        System.out.println("Main Query: " + mainQuery);
+			// Build main query with device IP filter
+			String mainQuery = "SELECT device_ip, "
+					+ "SUM(CASE WHEN status = 'Up' THEN total_duration_seconds ELSE 0 END) AS uptime_seconds, "
+					+ "SUM(CASE WHEN status = 'Down' THEN total_duration_seconds ELSE 0 END) AS downtime_seconds "
+					+ "FROM ( " + "    SELECT device_ip, status, " + "    COALESCE( "
+					+ "        LEAD(timestamp_epoch) OVER ( "
+					+ "            PARTITION BY device_ip, DATE(FROM_UNIXTIME(timestamp_epoch)) "
+					+ "            ORDER BY timestamp_epoch " + "        ) - timestamp_epoch, 0 "
+					+ "    ) AS total_duration_seconds " + "    FROM device_status_latency_history "
+					+ "    WHERE working_hour_flag = 1 AND timestamp BETWEEN :fromDate AND :toDate "
+					+ "    AND device_ip IN (:deviceIps) " + // Filter by devices from add_node table
+					") AS durations " + "GROUP BY device_ip";
 
-	        // Execute main query with parameters
-	        Query mainQ = getSession().createSQLQuery(mainQuery);
-	        mainQ.setParameter("fromDate", from_date);
-	        mainQ.setParameter("toDate", to_date);
-	        mainQ.setParameterList("deviceIps", deviceIps);  // Set the list of device IPs
+			System.out.println("Main Query: " + mainQuery);
 
-	        List<Object[]> mainResults = mainQ.list();
-	        System.out.println("Found " + mainResults.size() + " devices with status data");
+			// Execute main query with parameters
+			Query mainQ = getSession().createSQLQuery(mainQuery);
+			mainQ.setParameter("fromDate", from_date);
+			mainQ.setParameter("toDate", to_date);
+			mainQ.setParameterList("deviceIps", deviceIps); // Set the list of device IPs
 
-	        // Process results
-	        for (Object[] data : mainResults) {
-	            JSONArray array = new JSONArray();
-	            sr++;
-	            
-	            String ip = data[0].toString().trim();
-	            Map<String, String> deviceDetails = deviceMap.get(ip);
-	            
-	            String deviceName = "-";
-	            String groupName = "-";
-	            String deviceLocation = "-";
+			List<Object[]> mainResults = mainQ.list();
+			System.out.println("Found " + mainResults.size() + " devices with status data");
 
-	            if (deviceDetails != null) {
-	                deviceName = deviceDetails.get("deviceName");
-	                groupName = deviceDetails.get("groupName");
-	                deviceLocation = deviceDetails.get("LOCATION");
-	            } else {
-	                System.out.println("No device details found for IP: " + ip);
-	                continue; // Skip if no device details found
-	            }
+			// Process results
+			for (Object[] data : mainResults) {
+				JSONArray array = new JSONArray();
+				sr++;
 
-	            // Get uptime and downtime values
-	            Long uptime = 0L;
-	            Long downtime = 0L;
-	            
-	            try {
-	                uptime = data[1] != null ? Long.parseLong(data[1].toString().trim()) : 0L;
-	                downtime = data[2] != null ? Long.parseLong(data[2].toString().trim()) : 0L;
-	            } catch (NumberFormatException e) {
-	                System.out.println("Error parsing uptime/downtime for IP: " + ip);
-	                e.printStackTrace();
-	                continue;
-	            }
+				String ip = data[0].toString().trim();
+				Map<String, String> deviceDetails = deviceMap.get(ip);
 
-	            Long totalTime = uptime + downtime;
+				String deviceName = "-";
+				String groupName = "-";
+				String deviceLocation = "-";
 
-	            // Avoid division by zero
-	            if (totalTime == 0) {
-	                System.out.println("Total time is zero for IP: " + ip);
-	                continue;
-	            }
+				if (deviceDetails != null) {
+					deviceName = deviceDetails.get("deviceName");
+					groupName = deviceDetails.get("groupName");
+					deviceLocation = deviceDetails.get("LOCATION");
+				} else {
+					System.out.println("No device details found for IP: " + ip);
+					continue; // Skip if no device details found
+				}
 
-	            // Calculate percentages
-	            double uptimePercentage = (uptime * 100.0) / totalTime;
-	            double downtimePercentage = (downtime * 100.0) / totalTime;
+				// Get uptime and downtime values
+				Long uptime = 0L;
+				Long downtime = 0L;
 
-	            // Format time durations
-	            String formattedUptime = formatDuration(uptime);
-	            String formattedDowntime = formatDuration(downtime);
+				try {
+					uptime = data[1] != null ? Long.parseLong(data[1].toString().trim()) : 0L;
+					downtime = data[2] != null ? Long.parseLong(data[2].toString().trim()) : 0L;
+				} catch (NumberFormatException e) {
+					System.out.println("Error parsing uptime/downtime for IP: " + ip);
+					e.printStackTrace();
+					continue;
+				}
 
-	            // Format hours
-	            double uptimeHours = uptime / 3600.0; // Convert seconds to hours
-	            double downtimeHours = downtime / 3600.0; // Convert seconds to hours
-	            double totalHours = uptimeHours + downtimeHours;
+				Long totalTime = uptime + downtime;
 
-	            String formattedUptimeHours = String.format("%.2f", uptimeHours);
-	            String formattedDowntimeHours = String.format("%.2f", downtimeHours);
+				// Avoid division by zero
+				if (totalTime == 0) {
+					System.out.println("Total time is zero for IP: " + ip);
+					continue;
+				}
 
-	            // Calculate penalty
-	            penalty_cost_percentage = calculatePenaltyPercentage(uptimePercentage);
-	            double yearlyCostValue = Double.parseDouble(yearlyCost);
-	            penalty_cost = (yearlyCostValue * penalty_cost_percentage) / 100;
+				// Calculate percentages
+				double uptimePercentage = (uptime * 100.0) / totalTime;
+				double downtimePercentage = (downtime * 100.0) / totalTime;
 
-	            // Build the array
-	            DecimalFormat df = new DecimalFormat("0.00");
-	            array.put(sr);
-	            array.put(ip); // IP address
-	            array.put(deviceName);
-	            array.put(groupName);
-	            array.put(deviceLocation);
-	            array.put(formattedUptime);
-	            array.put(formattedDowntime);
-	            array.put(formattedUptimeHours);
-	            array.put(formattedDowntimeHours);
-	            array.put(String.format("%.2f", totalHours));
-	            array.put(df.format(uptimePercentage));
-	            array.put(df.format(downtimePercentage));
-	            array.put(yearlyCostValue);
-	            array.put(penalty_cost_percentage);
-	            array.put(penalty_cost);
-	            array.put(yearlyCostValue - penalty_cost);
+				// Format time durations
+				String formattedUptime = formatDuration(uptime);
+				String formattedDowntime = formatDuration(downtime);
 
-	            arrayList.put(array);
-	        }
+				// Format hours
+				double uptimeHours = uptime / 3600.0; // Convert seconds to hours
+				double downtimeHours = downtime / 3600.0; // Convert seconds to hours
+				double totalHours = uptimeHours + downtimeHours;
 
-	    } catch (Exception e) {
-	        System.out.println("Error in slaReportData: " + e.getMessage());
-	        e.printStackTrace();
-	    }
-	    
-	    System.out.println("Final Array Size: " + arrayList.length());
-	    return arrayList;
+				String formattedUptimeHours = String.format("%.2f", uptimeHours);
+				String formattedDowntimeHours = String.format("%.2f", downtimeHours);
+
+				// Calculate penalty
+				penalty_cost_percentage = calculatePenaltyPercentage(uptimePercentage);
+				double yearlyCostValue = Double.parseDouble(yearlyCost);
+				penalty_cost = (yearlyCostValue * penalty_cost_percentage) / 100;
+
+				// Build the array
+				DecimalFormat df = new DecimalFormat("0.00");
+				array.put(sr);
+				array.put(ip); // IP address
+				array.put(deviceName);
+				array.put(groupName);
+				array.put(deviceLocation);
+				array.put(formattedUptime);
+				array.put(formattedDowntime);
+				array.put(formattedUptimeHours);
+				array.put(formattedDowntimeHours);
+				array.put(String.format("%.2f", totalHours));
+				array.put(df.format(uptimePercentage));
+				array.put(df.format(downtimePercentage));
+				array.put(yearlyCostValue);
+				array.put(penalty_cost_percentage);
+				array.put(penalty_cost);
+				array.put(yearlyCostValue - penalty_cost);
+
+				arrayList.put(array);
+			}
+
+		} catch (Exception e) {
+			System.out.println("Error in slaReportData: " + e.getMessage());
+			e.printStackTrace();
+		}
+
+		System.out.println("Final Array Size: " + arrayList.length());
+		return arrayList;
 	}
 
 	// Helper method to format duration
 	private String formatDuration(long seconds) {
-	    if (seconds == 0) {
-	        return "0 Days, 0 Hours, 0 Minutes, 0 Seconds";
-	    }
-	    
-	    int day = (int) TimeUnit.SECONDS.toDays(seconds);
-	    long hours = TimeUnit.SECONDS.toHours(seconds) - (day * 24);
-	    long minute = TimeUnit.SECONDS.toMinutes(seconds) - (TimeUnit.SECONDS.toHours(seconds) * 60);
-	    long second = TimeUnit.SECONDS.toSeconds(seconds) - (TimeUnit.SECONDS.toMinutes(seconds) * 60);
-	    
-	    return day + " Days, " + hours + " Hours, " + minute + " Minutes, " + second + " Seconds";
+		if (seconds == 0) {
+			return "0 Days, 0 Hours, 0 Minutes, 0 Seconds";
+		}
+
+		int day = (int) TimeUnit.SECONDS.toDays(seconds);
+		long hours = TimeUnit.SECONDS.toHours(seconds) - (day * 24);
+		long minute = TimeUnit.SECONDS.toMinutes(seconds) - (TimeUnit.SECONDS.toHours(seconds) * 60);
+		long second = TimeUnit.SECONDS.toSeconds(seconds) - (TimeUnit.SECONDS.toMinutes(seconds) * 60);
+
+		return day + " Days, " + hours + " Hours, " + minute + " Minutes, " + second + " Seconds";
 	}
 
 	// Helper method to calculate penalty percentage
 	private int calculatePenaltyPercentage(double uptimePercentage) {
-	    if (uptimePercentage >= 99) {
-	        return 0;
-	    } else if (uptimePercentage >= 98.5) {
-	        return 10;
-	    } else if (uptimePercentage >= 97.5) {
-	        return 20;
-	    } else if (uptimePercentage >= 96.5) {
-	        return 25;
-	    } else {
-	        return 30;
-	    }
+		if (uptimePercentage >= 99) {
+			return 0;
+		} else if (uptimePercentage >= 98.5) {
+			return 10;
+		} else if (uptimePercentage >= 97.5) {
+			return 20;
+		} else if (uptimePercentage >= 96.5) {
+			return 25;
+		} else {
+			return 30;
+		}
 	}
 
 	public JSONArray LinkLatencystatusreport(String from_date, String to_date, List<String> ip_list) {
@@ -4696,8 +4687,8 @@ public class NodeReportDaoImpl extends AbstractDao<Integer, AddNodeModel> implem
 		try {
 			String query = "SELECT\r\n" + "	an.DEVICE_NAME,\r\n" + "	d.device_ip,\r\n" + "	an.GROUP_NAME,\r\n"
 					+ "   an.LOCATION,\r\n" + "	an.DISTRICT,	 \r\n" + "	an.STATE,	 \r\n"
-					+ "	d.uptime_seconds,\r\n" + "	d.downtime_seconds, an.Procured_Bandwidth\r\n" + "FROM\r\n" + "(\r\n" + "    SELECT\r\n"
-					+ "        device_ip,\r\n"
+					+ "	d.uptime_seconds,\r\n" + "	d.downtime_seconds, an.Procured_Bandwidth\r\n" + "FROM\r\n"
+					+ "(\r\n" + "    SELECT\r\n" + "        device_ip,\r\n"
 					+ "        SUM(CASE WHEN status = 'Up' THEN total_duration_seconds ELSE 0 END) AS uptime_seconds,\r\n"
 					+ "        SUM(CASE WHEN status = 'Down' THEN total_duration_seconds ELSE 0 END) AS downtime_seconds\r\n"
 					+ "    FROM\r\n" + "    (\r\n" + "        SELECT\r\n" + "            device_ip,\r\n"
@@ -5015,6 +5006,145 @@ public class NodeReportDaoImpl extends AbstractDao<Integer, AddNodeModel> implem
 			e.printStackTrace();
 		}
 		return finalarray;
+	}
+
+//	public String saveNodeStatusNotes(String id, String notes) {
+//		// TODO Auto-generated method stub
+//		System.out.println("Dao saveNodeStatusNotes");
+//		System.out.println("id:" + id);
+//		System.out.println("notes:" + notes);
+//
+//		String result = null;
+//		try {
+////			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+//			Add_Node_Notes note = new Add_Node_Notes();
+//			note.setSTATUS_ID(id);
+//			note.setNOTES(notes);
+//			note.setEventTimestamp(new Timestamp(System.currentTimeMillis()));
+//
+//			getSession().save(note);
+//			result = "success";
+//		} catch (Exception e) {
+//			System.out.println("Exception:" + e);
+//			result = "fail";
+//		}
+//
+//		return result;
+//	}
+//	
+//	public List<NodeStatusReportBean> NodeStatusReport(String from_date, String to_date, List<String> ip_list) {
+//
+//		String ip_data = ip_list.toString().replace("[", "").replace("]", "").replace(",", "','").replace(" ", "");
+//		System.out.println("IP List:" + ip_data + ":" + from_date + to_date);
+//		String query = "select report.ID,report.NODE_IP,report.NODE_STATUS,report.EVENT_TIMESTAMP,node.DEVICE_NAME,node.LOCATION,node.DISTRICT,node.STATE,node.ZONE,node.GROUP_NAME from add_node node join node_status_history report on node.DEVICE_IP=report.NODE_IP where node.DEVICE_IP in ('"
+//				+ ip_data + "') and  report.EVENT_TIMESTAMP BETWEEN '" + from_date + "' AND '" + to_date + "'";
+//		System.out.println("query :: " + query);
+//		Query q = getSession().createSQLQuery(query);
+//		List<NodeStatusReportBean> dataList = new ArrayList<NodeStatusReportBean>();
+//
+//		List<Object[]> data = q.list();
+//		System.out.println("Size Data:" + data.size());
+//		long id = 0;
+//		for (Object[] a : data) {
+//			id++;
+//			NodeStatusReportBean bean = new NodeStatusReportBean();
+//			bean.setID(id);
+//			bean.setNODE_IP((a[1] == null) ? "-" : a[1].toString().equals("") ? "-" : a[1].toString());
+//			bean.setNODE_STATUS((a[2] == null) ? "-" : a[2].toString().equals("") ? "-" : a[2].toString());
+//			bean.setEVENT_TIMESTAMP((a[3] == null) ? "-" : a[3].toString().equals("") ? "-" : a[3].toString());
+//			bean.setDEVICE_NAME((a[4] == null) ? "-" : a[4].toString().equals("") ? "-" : a[4].toString());
+//			bean.setLOCATION((a[5] == null) ? "-" : a[5].toString().equals("") ? "-" : a[5].toString());
+//			bean.setDISTRICT((a[6] == null) ? "-" : a[6].toString().equals("") ? "-" : a[6].toString());
+//			bean.setSTATE((a[7] == null) ? "-" : a[7].toString().equals("") ? "-" : a[7].toString());
+//			bean.setZONE((a[8] == null) ? "-" : a[8].toString().equals("") ? "-" : a[8].toString());
+//			bean.setGROUP_NAME((a[9] == null) ? "-" : a[9].toString().equals("") ? "-" : a[9].toString());
+//			String Id = (a[0] == null) ? "-" : a[0].toString().equals("") ? "-" : a[0].toString();
+//
+//			bean.setADD_NOTES((a[0] == null || a[0].toString().equals("")) ? "-"
+//					: "<button class='btn btn-sm btn-primary' onclick='addNotesClick(\"" + Id + "\")'>"
+//							+ "<i class='fas fa-plus'></i> Add</button>");
+//
+//			bean.setVIEW_NOTES((a[0] == null || a[0].toString().equals("")) ? "-"
+//					: "<button class='btn btn-sm btn-info' onclick='viewNotesClick(\"" + Id + "\")'>"
+//							+ "<i class='fas fa-eye'></i> View</button>");
+//			dataList.add(bean);
+//		}
+//
+//		return dataList;
+//	}
+
+	public String saveNodeNotes(String nodeIP, String notes, String dateTime) {
+		System.out.println("Dao saveNodeNotes");
+		System.out.println("nodeIP:" + nodeIP);
+		System.out.println("notes:" + notes);
+		System.out.println("dateTime:" + dateTime);
+
+		String result = null;
+		try {
+			// Convert string dateTime to Timestamp for exact matching
+			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
+			Date parsedDate = dateFormat.parse(dateTime);
+			Timestamp timestamp = new Timestamp(parsedDate.getTime());
+
+			// First, find the ID from NODE_STATUS_HISTORY table
+			String findIdQuery = "SELECT ID FROM NODE_STATUS_HISTORY WHERE NODE_IP = :nodeIP "
+					+ "AND NODE_STATUS = 'Down' " + "AND EVENT_TIMESTAMP = :eventTimestamp";
+
+			Query query = getSession().createSQLQuery(findIdQuery).setParameter("nodeIP", nodeIP)
+					.setParameter("eventTimestamp", timestamp);
+
+			List<Object> results = query.list();
+
+			if (results == null || results.isEmpty()) {
+				System.out.println("No record found for nodeIP: " + nodeIP + " with timestamp: " + timestamp
+						+ " and status: Down");
+
+				// Try with LIKE if exact match fails (in case of timestamp format issues)
+				String findIdQueryLike = "SELECT ID FROM NODE_STATUS_HISTORY WHERE NODE_IP = :nodeIP "
+						+ "AND NODE_STATUS = 'Down' "
+						+ "AND CAST(EVENT_TIMESTAMP AS VARCHAR) LIKE :eventTimestampPattern";
+
+				Query queryLike = getSession().createSQLQuery(findIdQueryLike).setParameter("nodeIP", nodeIP)
+						.setParameter("eventTimestampPattern", dateTime );
+
+				List<Object> resultsLike = queryLike.list();
+
+				if (resultsLike == null || resultsLike.isEmpty()) {
+					return "no_record_found";
+				}
+
+				String statusId = resultsLike.get(0).toString();
+				System.out.println("Found STATUS_ID using LIKE: " + statusId);
+
+				// Save the notes
+				Add_Node_Notes note = new Add_Node_Notes();
+				note.setSTATUS_ID(statusId);
+				note.setNOTES(notes);
+				note.setEventTimestamp(new Timestamp(System.currentTimeMillis()));
+
+				getSession().save(note);
+				result = "success";
+			} else {
+				String statusId = results.get(0).toString();
+				System.out.println("Found STATUS_ID: " + statusId);
+
+				// Save the notes
+				Add_Node_Notes note = new Add_Node_Notes();
+				note.setSTATUS_ID(statusId);
+				note.setNOTES(notes);
+				note.setEventTimestamp(new Timestamp(System.currentTimeMillis()));
+
+				getSession().save(note);
+				result = "success";
+			}
+
+		} catch (Exception e) {
+			System.out.println("Exception in saveNodeNotes:" + e);
+			e.printStackTrace();
+			result = "fail";
+		}
+
+		return result;
 	}
 
 }

@@ -178,6 +178,67 @@ function getNodeInfo(NodeStatus) {
 
 }
 
+
+function getNodetotalInfo(NodeStatus) {
+	var l = window.location;
+	var base_url = l.protocol + "//" + l.host + "/" + l.pathname.split('/')[1];
+	var serviceUrl = base_url + "/dashboard/getDeviceInfo";
+	var nodeDetailUrl = base_url + "/dashboard/nodeDetailsPage?nodeIP=";
+	$.ajax({
+		type: 'GET',
+		url: serviceUrl,
+		data: {
+			deviceInfo: NodeStatus
+		},
+		dataType: 'json',
+		success: function(data) {
+
+			var infoModal = $('#device-info-modalTotal');
+			infoModal.modal('show');
+
+			// Destroy the existing DataTable instance if it exists
+			if ($.fn.DataTable.isDataTable('#deviceInfoTableTotal')) {
+				$('#deviceInfoTableTotal').DataTable().clear().destroy();
+			}
+
+			// Clear the table body
+			$('#deviceInfoTableTotal tbody').empty();
+
+			var htmldata;
+			$.each(data, function(i, item) {
+				htmldata = $('<tr>').html(
+					"<td>" + data[i].srno + "</td>" + 
+					"<td><a href=" + nodeDetailUrl + data[i].deviceip + ">" + data[i].deviceip + "</a></td>" + 
+					"<td>" + data[i].devicename + "</td>" + 
+					"<td>" + data[i].location + "</td>" + 
+					"<td>" + data[i].company + "</td>"); // Added datetime column
+				$('#deviceInfoTableTotal tbody').append(htmldata);
+			});
+
+			var dataTable2 = $('#deviceInfoTableTotal').DataTable({
+				autoWidth: false,
+				buttons: ["copy", "csv", "excel", "print"],
+				deferRender: true,
+				"paging": false,
+				destroy: true,
+				scrollY: 500,
+				scroller: true
+			});
+
+			// Append the buttons container to the correct wrapper
+			dataTable2.buttons().container().appendTo(
+				'#deviceInfoTableTotal_wrapper .col-md-6:eq(0)'); // Fixed wrapper ID
+
+			setTimeout(function() {
+				dataTable2.columns.adjust().draw();
+			}, 500);
+
+		}
+
+	});
+
+}
+
 function allCount() {
 	deviceUpDownCount();
 

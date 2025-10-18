@@ -192,4 +192,6 @@ public interface NodeReportService {
 	String Deleteview_topology(String id);
 
 	JSONArray getview_topology(String userScopeData);
+
+	String saveNodeNotes(String nodeIP, String notes, String dateTime);
 }

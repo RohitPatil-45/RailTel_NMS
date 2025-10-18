@@ -443,4 +443,10 @@ public class NodeReportServiceImpl implements NodeReportService {
 		// TODO Auto-generated method stub
 		return dao.getview_topology(userScopeData);
 	}
+
+	
+	public String saveNodeNotes(String nodeIP, String notes, String dateTime) {
+		
+		return dao.saveNodeNotes(nodeIP,notes,dateTime);
+	}
 }

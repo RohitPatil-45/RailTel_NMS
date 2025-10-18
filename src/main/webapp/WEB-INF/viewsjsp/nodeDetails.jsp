@@ -539,6 +539,7 @@
 					<form id="addNotesForm">
 						<div class="modal-body">
 							<input type="hidden" id="notesNodeIP" name="nodeIP">
+							<input type="hidden" id="notesDateTime" name="dateTime">
 							<div class="form-group">
 								<label for="notesText">Notes:</label>
 								<textarea class="form-control" id="notesText" name="notes" rows="4" 
@@ -913,11 +914,18 @@
 
 		// Handle form submission for adding notes
 		$(document).ready(function() {
+			// Set the dateTime from the page when modal is shown
+			$('#addNotesModal').on('show.bs.modal', function() {
+				const currentDateTime = $('#datetime').text().trim();
+				$('#notesDateTime').val(currentDateTime);
+			});
+			
 			$('#addNotesForm').on('submit', function(e) {
 				e.preventDefault();
 				
 				const nodeIP = $('#notesNodeIP').val();
 				const notes = $('#notesText').val().trim();
+				const dateTime = $('#notesDateTime').val(); // Get dateTime from hidden field
 				
 				if (!notes) {
 					Swal.fire({
@@ -933,13 +941,14 @@
 				const submitBtn = $(this).find('button[type="submit"]');
 				submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Saving...');
 				
-				// AJAX call to save notes
+				// AJAX call to save notes with existing date and time
 				$.ajax({
 					type: 'POST',
-					url: '<%=request.getContextPath()%>/nodeDashboard/saveNodeNotes',
+					url: '<%=request.getContextPath()%>/nodeReport/saveNodeNotes',
 					data: {
 						nodeIP: nodeIP,
-						notes: notes
+						notes: notes,
+						dateTime: dateTime  // Use the existing dateTime from the page
 					},
 					success: function(response) {
 						$('#addNotesModal').modal('hide');
@@ -974,11 +983,6 @@
 				$('#addNotesForm').find('button[type="submit"]').prop('disabled', false).html('Save Notes');
 			});
 		});
-
-		// Update the Basic Info AJAX call to check status
-		// This should be integrated with your existing AJAX call
-		// In your existing Basic Info AJAX success function, add:
-		// updateAddNotesButton(data[0]['status']);
 
 		// Rest of your existing JavaScript code...
 		window.onload = function() {

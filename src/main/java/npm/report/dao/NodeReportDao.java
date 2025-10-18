@@ -206,4 +206,6 @@ public interface NodeReportDao {
 
 	JSONArray getLocationDeviceDetails(String group_name, String userScopeData);
 
+	String saveNodeNotes(String nodeIP, String notes, String dateTime);
+
 }

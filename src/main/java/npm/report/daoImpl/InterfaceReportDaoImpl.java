@@ -526,7 +526,7 @@ public class InterfaceReportDaoImpl extends AbstractDao<Integer, AddNodeModel> i
 		for (Object[] a : data) {
 			arrayData = new JSONArray();
 			arrayData.put(a[0]);
-//			arrayData.put(a[1]);
+			arrayData.put(a[2]);
 			arrayData.put("<span style='color:blue' onclick=\"getTotalPortSummaryDetails('" + a[0] + "')\">" + a[1]
 					+ "</span>");
 //			arrayData.put("<p onclick='getPortSummaryDetails('total')'>"+a[1]+"</p>");
